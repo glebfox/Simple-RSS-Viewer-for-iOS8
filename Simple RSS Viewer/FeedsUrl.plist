@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<array>
+		<string>Apple Hot News</string>
+		<string>http://images.apple.com/main/rss/hotnews/hotnews.rss</string>
+	</array>
+	<array>
+		<string>TechCrunch</string>
+		<string>http://techcrunch.com/feed/</string>
+	</array>
+</array>
+</plist>
