@@ -50,13 +50,15 @@
 
 - (void)addFeedWithTitle:(NSString *)title absoluteUrlString:(NSString *)urlString
 {
-    if ([self.feeds[0][1] isEqualToString:urlString]) {
-        return;
-    }
-    
-    for (int i = 0; i < self.feeds.count; i++) {
-        if ([self.feeds[i][1] isEqualToString:urlString]) {
-            [self.feeds removeObjectAtIndex:i];
+    if (self.feeds.count > 0) {
+        if ([self.feeds[0][1] isEqualToString:urlString]) {
+            return;
+        }
+        
+        for (int i = 0; i < self.feeds.count; i++) {
+            if ([self.feeds[i][1] isEqualToString:urlString]) {
+                [self.feeds removeObjectAtIndex:i];
+            }
         }
     }
     

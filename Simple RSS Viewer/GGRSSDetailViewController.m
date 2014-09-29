@@ -12,7 +12,7 @@
 
 @interface GGRSSDetailViewController ()
 
-@property GGRSSDimensionsProvider *dimensionsProvider;
+@property GGRSSDimensionsProvider *dimensionsProvider;  // Ссылка на Singleton, предоставляющий доступ к ресурсам с списком размеров для текста
 
 @end
 
@@ -48,18 +48,21 @@
 
 - (void)setDetailItem:(MWFeedItem *)newDetailItem
 {
+    // Для предотвращения повторного формирования новости, которая показывалась последний раз
     if (_detailItem != newDetailItem) {
         _detailItem = newDetailItem;
-        
-        //[self configureView];
     }
 }
 
+// ЗАполянет текстовую форму информацией по выбранной новости
 - (void)configureView
 {
+    // Если информция есть, то ...
     if (self.detailItem) {
+        // Создаем изменяемую форматную строку
         NSMutableAttributedString *detailInformation = [NSMutableAttributedString new];
         
+        // Заголовок новости получает полужирное начертание с размером взятым из ресурсов (больше чем у остального текста)
         if (self.detailItem.title) {
             UIFont *font = [UIFont boldSystemFontOfSize:[self.dimensionsProvider dimensionByName:@"DetailView_TitleSize"]];
             NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
@@ -70,6 +73,7 @@
             [detailInformation appendAttributedString: titleString];
         }
         
+        // Дата отобржается самым малееьким размером шрифта. Из ресурсов
         if (self.detailItem.date) {
             NSDateFormatter *formatter = [NSDateFormatter new];
             [formatter setDateStyle:NSDateFormatterShortStyle];
@@ -85,6 +89,7 @@
             
         }
         
+        // Основной текст получает размер по умолчанию (из настроек формы, но можно и добавить ресурс). Дополнительно основной текст получает межстрочный интервал, для более приятногочтения.
         if (self.detailItem.summary) {
             
             NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
@@ -98,6 +103,7 @@
         
         self.textView.attributedText = detailInformation;
         
+        // Если в информации имеется ссылка на новость в интернете, то к форме добавляется кнопка для перехода
         if (self.detailItem.link) {
             UIBarButtonItem *moreButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString (@"DetailView_ButtonMore", nil) style:UIBarButtonItemStylePlain target:self action:@selector(goLink:)];
             self.navigationItem.rightBarButtonItem = moreButton;
@@ -105,22 +111,12 @@
     }
 }
 
+// Открытие ссылки на новость в браузере или любом другом зарегестрированном для этого приложении
 - (IBAction)goLink:(id)sender
 {
     if (self.detailItem.link) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.detailItem.link]];
     }
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

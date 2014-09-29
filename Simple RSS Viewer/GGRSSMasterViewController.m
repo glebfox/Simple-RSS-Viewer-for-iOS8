@@ -33,6 +33,7 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    // Если свойство задано как YES, то очищаем выделения строк в таблице при ее отображении
     if (self.clearsSelectionOnViewWillAppear) {
         [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
     }
@@ -41,25 +42,34 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    // При возвращении к таблице долдны очищаться выделения
     self.clearsSelectionOnViewWillAppear = YES;
     
+    // Инициализируем форматтер даты и времени
     self.formatter = [NSDateFormatter new];
     [self.formatter setDateStyle:NSDateFormatterShortStyle];
     [self.formatter setTimeStyle:NSDateFormatterShortStyle];
+    
+    // Иниализируем массивы с элементами для отображения и элементами, которые получаются при парсинге
     self.parsedItems = [NSMutableArray new];
     self.itemsToDisplay = [NSArray new];
     
+    // Иниализируем активити индикатор
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:self.refreshControl];
     
+    // Получаем ссылки на инстансы Singleton классав с ресурсами
     self.dimensionsProvider = [GGRSSDimensionsProvider sharedInstance];
     self.feeds = [GGRSSFeedsCollection sharedInstance];
     
+    // Получаем последний загруженный адрес на фид
     NSURL *feedURL = [self.feeds lastUsedUrl];
-    //    [NSURL URLWithString:@"http://images.apple.com/main/rss/hotnews/hotnews.rss"];
-    //    NSURL *feedURL = [NSURL URLWithString:@"http://techcrunch.com/feed/"];
-    [self setParserWithUrl:feedURL];
+    
+    // Стартуем парсер
+    if (feedURL != nil) {
+        [self setParserWithUrl:feedURL];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -69,16 +79,21 @@
 
 #pragma mark - Parsing
 
+// Создает новый парсер с указанным url
 - (void)setParserWithUrl:(NSURL *)url
 {
+    // Обновляем заголовок формы, запускаем анимацию и скрываем таблицу, чтобы было видно анимацию
     self.title = NSLocalizedString (@"MasterViewTitle_Loading", nil);
     [self.spinner startAnimating];
     self.tableView.hidden = YES;
+    
+    // Если не первый запуск, то останавливаем прерыдущий парсинг и обнуляем парсер
     if (self.feedParser != nil) {
         [self.feedParser stopParsing];
         self.feedParser = nil;
     }
     
+    // Для непустой ссылки создаем нвоый парсер
     if (url != nil) {
         self.feedParser = [[MWFeedParser alloc] initWithFeedURL:url];
         self.feedParser.delegate = self;
@@ -89,25 +104,25 @@
     }
 }
 
+// Обвновляем таблицу текущим фидом
 - (void)refresh
 {
     self.title = NSLocalizedString (@"MasterViewTitle_Refreshing", nil);
     [self.parsedItems removeAllObjects];
     [self.feedParser stopParsing];
     [self.feedParser parse];
-    //self.tableView.userInteractionEnabled = NO;
-    //    self.tableView.alpha = 0.3;
 }
 
 - (void)updateTableWithParsedItems
 {
+    // Сортируем элементы по дате
     self.itemsToDisplay = [self.parsedItems sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO]]];
-    //self.tableView.userInteractionEnabled = YES;
-    //    self.tableView.alpha = 1;
     [self.tableView reloadData];
+    // Отображаем таблицу и завершаем анимации обновления
     self.tableView.hidden = NO;
     [self.refreshControl endRefreshing];
     [self.spinner stopAnimating];
+    // Перемещаем фокут к самой верхней записи
     [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:NO];
 }
 
@@ -139,20 +154,16 @@
 
 - (void)feedParser:(MWFeedParser *)parser didFailWithError:(NSError *)error
 {
-//    NSLog(@"Finished Parsing With Error: %@", error);
-//    if (self.parsedItems.count == 0) {
-//        self.title = @"Failed"; // Show failed message in title
-//    } else {
-        // Failed but some items parsed, so show and inform of error
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
-                                                        message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
+    // В случае ошибки формируем предупреждение для пользователя
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
+                                            message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
                                                        delegate:nil
-                                              cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
-                                              otherButtonTitles:nil];
-        if (self.parsedItems.count > 0)
-            [self.parsedItems removeAllObjects];
-        [alert show];
-//    }
+                                            cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
+                                            otherButtonTitles:nil];
+    // Очищам итемы для отображения, чтобы таблица оказалась пустой
+    if (self.parsedItems.count > 0)
+        [self.parsedItems removeAllObjects];
+    [alert show];
     self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
     [self updateTableWithParsedItems];
 }
@@ -184,6 +195,7 @@
     // Configure the cell...
     MWFeedItem *item = [self.itemsToDisplay objectAtIndex:indexPath.row];
     if (item) {
+        // Заголовок строки = заголовок новости. Полужирное начертание
         NSString *itemTitle = item.title ? [item.title stringByConvertingHTMLToPlainText]:NSLocalizedString (@"MasterView_FeedNoTitle", nil);
         UIFont *font = [UIFont boldSystemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_TitleSize"]];
         
@@ -191,6 +203,7 @@
         
         NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:itemTitle attributes:attributes];
         
+        // Оставшееся место в заголовке строки заполняем описанием новости. Обычное написание, шрифт поменьше.
         if (item.summary) {
             font = [UIFont systemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_SubtitleSize"]];
             attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
@@ -201,6 +214,7 @@
         
         cell.textLabel.attributedText = title;
         
+        // Подзаголовок строки = дата новости
         if (item.date) {
             cell.detailTextLabel.text = [NSString stringWithFormat:@"%@", [self.formatter stringFromDate:item.date]];
         }
@@ -209,74 +223,19 @@
     return cell;
 }
 
-//- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-//
-//    return 80;
-//}
-
- #pragma mark Table view delegate
-/*
- - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
- 
-	// Show detail
-//	GGRSSDetailViewController *detail = [[GGRSSDetailViewController alloc] init];
-//	detail.item = (MWFeedItem *)[self.itemsToDisplay objectAtIndex:indexPath.row];
-//	[self.navigationController pushViewController:detail animated:YES];
-	
-	// Deselect
-//	[self.tableView deselectRowAtIndexPath:indexPath animated:YES];	
- }*/
-
-/*
- // Override to support conditional editing of the table view.
- - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
- {
- // Return NO if you do not want the specified item to be editable.
- return YES;
- }
- */
-
-/*
- // Override to support editing the table view.
- - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
- {
- if (editingStyle == UITableViewCellEditingStyleDelete) {
- // Delete the row from the data source
- [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
- } else if (editingStyle == UITableViewCellEditingStyleInsert) {
- // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
- }
- }
- */
-
-/*
- // Override to support rearranging the table view.
- - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
- {
- }
- */
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
- {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
-
-
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
+    // Если мы переходим к детальному представлению, то передаем ему информацию по выбранной новости
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         MWFeedItem *item = self.itemsToDisplay[indexPath.row];
         [[segue destinationViewController] setDetailItem:item];
     }
     
+    // На память, как добраться до вьювера через его Навигейшн контроллер
 //    if ([[segue identifier] isEqualToString:@"showSettings"]) {
 //        UINavigationController *navController = (UINavigationController *)segue.destinationViewController;
 //        GGRSSAddFeedViewController *controller = (GGRSSAddFeedViewController *)navController.topViewController;
@@ -286,8 +245,10 @@
 
 - (IBAction)unwindToMasterView:(UIStoryboardSegue *)segue
 {
+    // Вне зависимости от того с какой формы мы вернулись в главной, они должны поддерживать протокол, который предусматривает наличие ссылки на url
     id <GGRSSFeedUrlSource> sourse = [segue sourceViewController];
     NSURL *newUrl = sourse.url;
+    // Поэтому, если url не пустой и не равен уже загруженному фиду, то запускаем новый парсинг
     if (newUrl != nil && ![self.feedParser.url isEqual:newUrl]) {
         [self setParserWithUrl:newUrl];
     }

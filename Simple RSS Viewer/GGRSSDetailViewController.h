@@ -11,7 +11,7 @@
 
 @interface GGRSSDetailViewController : UIViewController
 
-@property (nonatomic, strong) MWFeedItem *detailItem;
+@property (nonatomic, strong) MWFeedItem *detailItem;   // Элемент с описанием отображаемой новости
 
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 

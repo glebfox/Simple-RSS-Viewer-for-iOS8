@@ -12,8 +12,10 @@
 
 @interface GGRSSFeedsTableViewController ()
 
-@property GGRSSFeedsCollection *feeds;
-@property GGRSSDimensionsProvider *dimensionsProvider;
+@property NSArray *feedsInfo;   // Список фидов для отображения
+
+@property GGRSSFeedsCollection *feeds;  // Ссылка на Singleton, предоставляющий доступ к ресурсам с списком фидов
+@property GGRSSDimensionsProvider *dimensionsProvider;  // Ссылка на Singleton, предоставляющий доступ к ресурсам с списком размеров для текста
 
 @end
 
@@ -21,12 +23,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+
     self.dimensionsProvider = [GGRSSDimensionsProvider sharedInstance];
     
     self.feeds = [GGRSSFeedsCollection sharedInstance];
@@ -58,10 +55,11 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentider];
     }
     
-    // Configure the cell...
+    // Заголовок будет хранить название фида
     cell.textLabel.font = [UIFont boldSystemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_TitleSize"]];
     cell.textLabel.text = self.feedsInfo[indexPath.row][0];
     
+    // Подзаголовок будет хранить адрес фида
     cell.detailTextLabel.font = [UIFont systemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_SubtitleSize"]];
     cell.detailTextLabel.text = self.feedsInfo[indexPath.row][1];
     
@@ -77,7 +75,7 @@
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
+        // Удаляем выбранную строку с формы и из ресурсов
         [self.feeds deleteFeedAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
@@ -85,31 +83,18 @@
     }   
 }
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+
+    // Если переход вызван не нажатием на ячейку таблицы
     if ([sender class] != [UITableViewCell class]) {
+        // То выозвращаем пустой url
         self.url = nil;
         return;
     }
+    // В остальныйх случая считываем адресс фида с ячейки
     UITableViewCell *cell = sender;
     self.url = [NSURL URLWithString:cell.detailTextLabel.text];
 }

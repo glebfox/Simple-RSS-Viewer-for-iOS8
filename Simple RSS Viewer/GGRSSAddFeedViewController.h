@@ -11,6 +11,6 @@
 
 @interface GGRSSAddFeedViewController : UITableViewController <GGRSSFeedUrlSource>
 
-@property NSURL *url;
+@property NSURL *url;       // Адресс к которому будет обращаться главная форма
 
 @end
