@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "MWFeedInfo.h"
 
 @interface GGRSSFeedsCollection : NSObject
 

@@ -11,9 +11,6 @@
 
 @interface GGRSSFeedsTableViewController : UITableViewController <GGRSSFeedUrlSource>
 
-@property NSURL *url;   // Адрес к которому обратится главная форма, когда будет выбрана ячейка в таблице
-
-// Позволяет вернуться к списку фидов с формы добавления нового фида
-- (IBAction)unwindToFeeds:(UIStoryboardSegue *)segue;
+//@property NSURL *url;   // Адрес к которому обратится главная форма, когда будет выбрана ячейка в таблице
 
 @end

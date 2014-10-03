@@ -8,22 +8,23 @@
 
 #import "GGRSSMasterViewController.h"
 #import "GGRSSDetailViewController.h"
-#import "GGRSSAddFeedViewController.h"
-#import "GGRSSFeedsTableViewController.h"
 #import "GGRSSFeedsCollection.h"
 #import "GGRSSDimensionsProvider.h"
 #import "GGRSSFeedUrlSource.h"
 #import "MWFeedParser.h"
 #import "NSString+HTML.h"
 
-@interface GGRSSMasterViewController ()
+@interface GGRSSMasterViewController () <MWFeedParserDelegate>
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 
 @property (strong, nonatomic) MWFeedParser *feedParser;
 @property (strong, nonatomic) NSMutableArray *parsedItems;
 @property (strong, nonatomic) NSDateFormatter *formatter;
 @property (strong, nonatomic) NSArray *itemsToDisplay;
-@property GGRSSFeedsCollection *feeds;
-@property GGRSSDimensionsProvider *dimensionsProvider;
+
+@property (nonatomic,retain) UIRefreshControl *refreshControl;
 
 @end
 
@@ -33,17 +34,14 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    // Если свойство задано как YES, то очищаем выделения строк в таблице при ее отображении
-    if (self.clearsSelectionOnViewWillAppear) {
+
+    if ([self.tableView indexPathForSelectedRow]) {
         [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
     }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // При возвращении к таблице долдны очищаться выделения
-    self.clearsSelectionOnViewWillAppear = YES;
     
     // Инициализируем форматтер даты и времени
     self.formatter = [NSDateFormatter new];
@@ -59,12 +57,8 @@
     [self.refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:self.refreshControl];
     
-    // Получаем ссылки на инстансы Singleton классав с ресурсами
-    self.dimensionsProvider = [GGRSSDimensionsProvider sharedInstance];
-    self.feeds = [GGRSSFeedsCollection sharedInstance];
-    
     // Получаем последний загруженный адрес на фид
-    NSURL *feedURL = [self.feeds lastUsedUrl];
+    NSURL *feedURL = [[GGRSSFeedsCollection sharedInstance] lastUsedUrl];
     
     // Стартуем парсер
     if (feedURL != nil) {
@@ -148,7 +142,7 @@
 - (void)feedParserDidFinish:(MWFeedParser *)parser
 {
 //    NSLog(@"Finished Parsing%@", (parser.stopped ? @" (Stopped)" : @""));
-    [self.feeds addFeedWithTitle:self.title absoluteUrlString:[self.feedParser.url absoluteString]];
+    [[GGRSSFeedsCollection sharedInstance] addFeedWithTitle:self.title absoluteUrlString:[self.feedParser.url absoluteString]];
     [self updateTableWithParsedItems];
 }
 
@@ -197,7 +191,7 @@
     if (item) {
         // Заголовок строки = заголовок новости. Полужирное начертание
         NSString *itemTitle = item.title ? [item.title stringByConvertingHTMLToPlainText]:NSLocalizedString (@"MasterView_FeedNoTitle", nil);
-        UIFont *font = [UIFont boldSystemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_TitleSize"]];
+        UIFont *font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_TitleSize"]];
         
         NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
         
@@ -205,7 +199,7 @@
         
         // Оставшееся место в заголовке строки заполняем описанием новости. Обычное написание, шрифт поменьше.
         if (item.summary) {
-            font = [UIFont systemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_SubtitleSize"]];
+            font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_SubtitleSize"]];
             attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
             NSMutableAttributedString *summary = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@", [[item.summary stringByConvertingHTMLToPlainText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]] attributes:attributes];
             

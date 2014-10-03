@@ -19,6 +19,8 @@
 
 @implementation GGRSSAddFeedViewController
 
+@synthesize url;
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     

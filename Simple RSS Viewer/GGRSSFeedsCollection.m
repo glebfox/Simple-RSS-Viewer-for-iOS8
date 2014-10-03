@@ -67,7 +67,7 @@
 
 - (NSArray *)allFeeds
 {
-    return self.feeds;
+    return [self.feeds copy];
 }
 
 - (void)saveFeeds

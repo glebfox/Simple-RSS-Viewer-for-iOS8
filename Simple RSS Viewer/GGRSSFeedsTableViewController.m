@@ -14,20 +14,16 @@
 
 @property NSArray *feedsInfo;   // Список фидов для отображения
 
-@property GGRSSFeedsCollection *feeds;  // Ссылка на Singleton, предоставляющий доступ к ресурсам с списком фидов
-@property GGRSSDimensionsProvider *dimensionsProvider;  // Ссылка на Singleton, предоставляющий доступ к ресурсам с списком размеров для текста
-
 @end
 
 @implementation GGRSSFeedsTableViewController
 
+@synthesize url;
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    self.dimensionsProvider = [GGRSSDimensionsProvider sharedInstance];
     
-    self.feeds = [GGRSSFeedsCollection sharedInstance];
-    self.feedsInfo = self.feeds.allFeeds;
+    self.feedsInfo = [[GGRSSFeedsCollection sharedInstance] allFeeds];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -56,11 +52,11 @@
     }
     
     // Заголовок будет хранить название фида
-    cell.textLabel.font = [UIFont boldSystemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_TitleSize"]];
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_TitleSize"]];
     cell.textLabel.text = self.feedsInfo[indexPath.row][0];
     
     // Подзаголовок будет хранить адрес фида
-    cell.detailTextLabel.font = [UIFont systemFontOfSize:[self.dimensionsProvider dimensionByName:@"TableView_SubtitleSize"]];
+    cell.detailTextLabel.font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_SubtitleSize"]];
     cell.detailTextLabel.text = self.feedsInfo[indexPath.row][1];
     
     return cell;
@@ -76,8 +72,9 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Удаляем выбранную строку с формы и из ресурсов
-        [self.feeds deleteFeedAtIndex:indexPath.row];
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        [[GGRSSFeedsCollection sharedInstance] deleteFeedAtIndex:indexPath.row];
+        self.feedsInfo = [[GGRSSFeedsCollection sharedInstance] allFeeds];
+        [tableView reloadData];
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
     }   
