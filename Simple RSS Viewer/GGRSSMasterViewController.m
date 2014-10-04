@@ -226,7 +226,9 @@
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         MWFeedItem *item = self.itemsToDisplay[indexPath.row];
-        [[segue destinationViewController] setDetailItem:item];
+        if ([segue.destinationViewController class] == [GGRSSDetailViewController class]) {
+            [segue.destinationViewController setDetailItem:item];
+        }
     }
     
     // На память, как добраться до вьювера через его Навигейшн контроллер
@@ -240,11 +242,13 @@
 - (IBAction)unwindToMasterView:(UIStoryboardSegue *)segue
 {
     // Вне зависимости от того с какой формы мы вернулись в главной, они должны поддерживать протокол, который предусматривает наличие ссылки на url
-    id <GGRSSFeedUrlSource> sourse = [segue sourceViewController];
-    NSURL *newUrl = sourse.url;
-    // Поэтому, если url не пустой и не равен уже загруженному фиду, то запускаем новый парсинг
-    if (newUrl != nil && ![self.feedParser.url isEqual:newUrl]) {
-        [self setParserWithUrl:newUrl];
+    if ([[segue.sourceViewController class] conformsToProtocol:@protocol(GGRSSFeedUrlSource)]) {
+        id <GGRSSFeedUrlSource> sourse = [segue sourceViewController];
+        NSURL *newUrl = sourse.url;
+        // Поэтому, если url не пустой и не равен уже загруженному фиду, то запускаем новый парсинг
+        if (newUrl != nil && ![self.feedParser.url isEqual:newUrl]) {
+            [self setParserWithUrl:newUrl];
+        }
     }
 }
 

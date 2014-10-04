@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "GGRSSFeedUrlSource.h"
 
-@interface GGRSSAddFeedViewController : UITableViewController <GGRSSFeedUrlSource>
+@interface GGRSSAddFeedViewController : UIViewController <GGRSSFeedUrlSource>
 
 @end

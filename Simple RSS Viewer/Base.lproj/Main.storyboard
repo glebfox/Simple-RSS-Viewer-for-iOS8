@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="14A361p" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Uj2-lQ-ri1">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="14A379b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Uj2-lQ-ri1">
     <dependencies>
         <deployment defaultVersion="1808" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
@@ -124,7 +124,7 @@
                     <navigationItem key="navigationItem" title="Feeds" id="ODd-Gs-V57">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="ryW-90-UHv">
                             <connections>
-                                <segue destination="VQV-3Q-bBz" kind="presentation" id="K43-Gc-I9d"/>
+                                <segue destination="yJr-A7-m0U" kind="presentation" id="WEr-fo-OSg"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -135,62 +135,58 @@
             <point key="canvasLocation" x="1003" y="977"/>
         </scene>
         <!--Add Feed-->
-        <scene sceneID="TAW-4c-mWd">
+        <scene sceneID="Ude-3a-mk5">
             <objects>
-                <tableViewController id="2Ks-ZF-vb4" customClass="GGRSSAddFeedViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="none" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="jCo-xS-YsS">
+                <viewController id="h2G-6c-fpO" customClass="GGRSSAddFeedViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ijZ-ZK-ZbQ"/>
+                        <viewControllerLayoutGuide type="bottom" id="Trg-ir-1K8"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="bmW-iU-9Tv">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <sections>
-                            <tableViewSection headerTitle="Feed URL" id="66O-kQ-knq">
-                                <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="4XN-gb-0e3">
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="4XN-gb-0e3" id="mAy-ox-R7f">
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="sp7-3Z-Heg">
-                                                    <rect key="frame" x="8" y="7" width="584" height="30"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits"/>
-                                                </textField>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="sp7-3Z-Heg" firstAttribute="top" secondItem="mAy-ox-R7f" secondAttribute="topMargin" constant="-1" id="Sq8-Jv-MTS"/>
-                                                <constraint firstItem="sp7-3Z-Heg" firstAttribute="trailing" secondItem="mAy-ox-R7f" secondAttribute="trailingMargin" id="eNH-we-4Cb"/>
-                                                <constraint firstItem="sp7-3Z-Heg" firstAttribute="leading" secondItem="mAy-ox-R7f" secondAttribute="leadingMargin" id="xgE-vs-KMP"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                        </sections>
-                        <connections>
-                            <outlet property="dataSource" destination="2Ks-ZF-vb4" id="FND-00-DR6"/>
-                            <outlet property="delegate" destination="2Ks-ZF-vb4" id="3aD-90-XuQ"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Add Feed" id="smJ-1d-QOW">
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="L1T-tD-83V">
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Feed URL" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7ug-0A-Enx">
+                                <rect key="frame" x="16" y="115" width="568" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="dJ8-Iz-8YB">
+                                <rect key="frame" x="16" y="144" width="568" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="7ug-0A-Enx" firstAttribute="trailing" secondItem="bmW-iU-9Tv" secondAttribute="trailingMargin" id="B6P-RQ-huZ"/>
+                            <constraint firstItem="7ug-0A-Enx" firstAttribute="leading" secondItem="bmW-iU-9Tv" secondAttribute="leadingMargin" id="EOf-NI-Jje"/>
+                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="top" secondItem="7ug-0A-Enx" secondAttribute="bottom" constant="8.5" id="OmP-5e-8UW"/>
+                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="trailing" secondItem="bmW-iU-9Tv" secondAttribute="trailingMargin" id="cEt-5S-FZu"/>
+                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="leading" secondItem="bmW-iU-9Tv" secondAttribute="leadingMargin" id="fVO-UU-NFf"/>
+                            <constraint firstItem="7ug-0A-Enx" firstAttribute="top" secondItem="ijZ-ZK-ZbQ" secondAttribute="bottom" constant="51" id="yUo-qV-i1g"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Add Feed" id="ZhL-Jg-IiJ">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="asa-po-tqL">
                             <connections>
-                                <segue destination="MLs-Zl-nGV" kind="unwind" unwindAction="unwindToFeeds:" id="mNK-mk-5WN"/>
+                                <segue destination="C4P-bV-QxC" kind="unwind" unwindAction="unwindToFeeds:" id="fHS-no-dSR"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="B83-Jb-8vb">
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="9X8-PF-Mpb">
                             <connections>
-                                <segue destination="MLs-Zl-nGV" kind="unwind" unwindAction="unwindToMasterView:" id="eb7-mN-qf6"/>
+                                <segue destination="C4P-bV-QxC" kind="unwind" unwindAction="unwindToMasterView:" id="mUF-Eh-fGn"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="doneButton" destination="B83-Jb-8vb" id="n75-Xc-0h4"/>
-                        <outlet property="urlText" destination="sp7-3Z-Heg" id="NeW-pi-V0e"/>
+                        <outlet property="doneButton" destination="9X8-PF-Mpb" id="KCv-7g-M9g"/>
+                        <outlet property="urlText" destination="dJ8-Iz-8YB" id="aHB-iB-XAL"/>
                     </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="9v0-f1-xCs" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="MLs-Zl-nGV" userLabel="Exit" sceneMemberID="exit"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="nwx-a3-iyd" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="C4P-bV-QxC" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2627" y="977"/>
         </scene>
@@ -257,20 +253,20 @@
             <point key="canvasLocation" x="191" y="175"/>
         </scene>
         <!--Navigation Controller-->
-        <scene sceneID="VmX-5z-W9B">
+        <scene sceneID="Mls-Jx-HAa">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="VQV-3Q-bBz" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="yJr-A7-m0U" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Jp8-yJ-oyo">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="72w-VM-eBr">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="2Ks-ZF-vb4" kind="relationship" relationship="rootViewController" id="2VJ-95-wrd"/>
+                        <segue destination="h2G-6c-fpO" kind="relationship" relationship="rootViewController" id="Vlv-oN-aTw"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="C5S-u9-7bT" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KQc-Uk-5G5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1815" y="977"/>
         </scene>

@@ -9,6 +9,7 @@
 #import "GGRSSFeedsTableViewController.h"
 #import "GGRSSFeedsCollection.h"
 #import "GGRSSDimensionsProvider.h"
+#import "GGRSSMasterViewController.h"
 
 @interface GGRSSFeedsTableViewController ()
 
@@ -84,16 +85,20 @@
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-
-    // Если переход вызван не нажатием на ячейку таблицы
-    if ([sender class] != [UITableViewCell class]) {
-        // То выозвращаем пустой url
-        self.url = nil;
-        return;
+    if ([segue.destinationViewController class] == [GGRSSMasterViewController class]) {
+        // Если переход вызван не нажатием на ячейку таблицы
+        if ([sender class] != [UITableViewCell class]) {
+            // То выозвращаем пустой url
+            self.url = nil;
+            return;
+        }
+        
+        // В остальныйх случая считываем адресс фида с ячейки
+        UITableViewCell *cell = sender;
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+        self.url = self.feedsInfo[indexPath.row][1];
+//        self.url = [NSURL URLWithString:cell.detailTextLabel.text];
     }
-    // В остальныйх случая считываем адресс фида с ячейки
-    UITableViewCell *cell = sender;
-    self.url = [NSURL URLWithString:cell.detailTextLabel.text];
 }
 
 - (IBAction)unwindToFeeds:(UIStoryboardSegue *)segue
