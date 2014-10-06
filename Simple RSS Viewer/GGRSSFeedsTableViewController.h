@@ -11,6 +11,6 @@
 
 @interface GGRSSFeedsTableViewController : UITableViewController <GGRSSFeedUrlSource>
 
-//@property NSURL *url;   // Адрес к которому обратится главная форма, когда будет выбрана ячейка в таблице
+@property NSArray *feedsToDisplay;   // Список фидов для отображения
 
 @end

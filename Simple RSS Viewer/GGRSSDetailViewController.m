@@ -52,7 +52,7 @@
 
 #pragma mark - Managing the detail item
 
-- (void)setDetailItem:(MWFeedItem *)newDetailItem
+- (void)setDetailItem:(GGRSSFeedItemInfo *)newDetailItem
 {
 //    NSLog(@"Detail - setDetailItem:");
     _detailItem = newDetailItem;
@@ -100,6 +100,8 @@
             
             [detailInformation appendAttributedString: dateString];
             
+        } else {
+            [detailInformation appendAttributedString: [[NSAttributedString alloc] initWithString: @"\n\n"]];
         }
         
         // Основной текст получает размер по умолчанию (из настроек формы, но можно и добавить ресурс). Дополнительно основной текст получает межстрочный интервал, для более приятногочтения.
@@ -122,7 +124,7 @@
 - (IBAction)goLink:(id)sender
 {
     if (self.detailItem.link) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.detailItem.link]];
+        [[UIApplication sharedApplication] openURL:self.detailItem.link];
     }
 }
 

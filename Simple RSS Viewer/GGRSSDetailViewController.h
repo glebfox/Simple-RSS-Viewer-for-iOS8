@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MWFeedItem.h"
+#import "GGRSSFeedItemInfo.h"
 
 @interface GGRSSDetailViewController : UIViewController
 
-@property (nonatomic, strong) MWFeedItem *detailItem;   // Элемент с описанием отображаемой новости
+@property (nonatomic, strong) GGRSSFeedItemInfo *detailItem;   // Элемент с описанием отображаемой новости
 
 @end

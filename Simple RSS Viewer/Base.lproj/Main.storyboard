@@ -43,7 +43,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="rSY-la-QTz" kind="show" identifier="showDetail" id="wvp-CI-UxS"/>
+                                            <segue destination="BY3-6t-8x1" kind="show" identifier="showDetail" id="D0w-Jr-IMN"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -70,7 +70,7 @@
                     <navigationItem key="navigationItem" id="wdJ-iV-B5q">
                         <barButtonItem key="rightBarButtonItem" title="Feeds" id="SC5-ct-oyY">
                             <connections>
-                                <segue destination="9td-bP-K2q" kind="show" id="dqZ-Lc-CJV"/>
+                                <segue destination="9td-bP-K2q" kind="show" identifier="showFeeds" id="dqZ-Lc-CJV"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -191,46 +191,29 @@
             <point key="canvasLocation" x="2627" y="977"/>
         </scene>
         <!--Detail View Controller-->
-        <scene sceneID="564-No-awc">
+        <scene sceneID="5bP-6Z-VcG">
             <objects>
-                <viewController id="rSY-la-QTz" customClass="GGRSSDetailViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="hvR-jz-9RQ"/>
-                        <viewControllerLayoutGuide type="bottom" id="V0b-vP-OCM"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="dDl-vy-7vY">
+                <viewController id="BY3-6t-8x1" customClass="GGRSSDetailViewController" sceneMemberID="viewController">
+                    <textView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" id="757-Mm-T7a">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JdU-hx-Gl0">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <attributedString key="attributedText">
-                                    <fragment>
-                                        <string key="content">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                                        <attributes>
-                                            <font key="NSFont" size="14" name="HelveticaNeue"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
-                                        </attributes>
-                                    </fragment>
-                                </attributedString>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                        </subviews>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="JdU-hx-Gl0" firstAttribute="top" secondItem="dDl-vy-7vY" secondAttribute="topMargin" id="GTl-Qd-3zj"/>
-                            <constraint firstItem="JdU-hx-Gl0" firstAttribute="leading" secondItem="dDl-vy-7vY" secondAttribute="leadingMargin" constant="-16" id="OLD-fS-n4V"/>
-                            <constraint firstItem="V0b-vP-OCM" firstAttribute="top" secondItem="JdU-hx-Gl0" secondAttribute="bottom" id="hT2-6z-3S5"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="JdU-hx-Gl0" secondAttribute="trailing" constant="-16" id="x3O-4s-LGi"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="BHo-L1-xFh"/>
+                        <attributedString key="attributedText">
+                            <fragment>
+                                <string key="content">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <attributes>
+                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                    <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                </attributes>
+                            </fragment>
+                        </attributedString>
+                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                    </textView>
                     <connections>
-                        <outlet property="textView" destination="JdU-hx-Gl0" id="c7h-K6-Nzv"/>
+                        <outlet property="textView" destination="757-Mm-T7a" id="6qU-Ye-QKf"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="rg8-Fq-kS6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NvR-DI-nZO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1815" y="175"/>
         </scene>

@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface GGRSSMasterViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface GGRSSMasterViewController : UIViewController
+
+- (void)setParserWithUrl:(NSURL *)url;
 
 @end

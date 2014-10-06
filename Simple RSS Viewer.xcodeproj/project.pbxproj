@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E48B74619E185450019C661 /* GGRSSFeedInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E48B74119E185450019C661 /* GGRSSFeedInfo.m */; };
+		7E48B74719E185450019C661 /* GGRSSFeedItemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E48B74319E185450019C661 /* GGRSSFeedItemInfo.m */; };
+		7E48B74819E185450019C661 /* GGRSSFeedParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E48B74519E185450019C661 /* GGRSSFeedParser.m */; };
 		7E5B891519D86B8E006FBC8C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B891419D86B8E006FBC8C /* main.m */; };
 		7E5B891819D86B8E006FBC8C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B891719D86B8E006FBC8C /* AppDelegate.m */; };
 		7E5B891E19D86B8E006FBC8C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E5B891C19D86B8E006FBC8C /* Main.storyboard */; };
@@ -40,6 +43,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7E48B74019E185450019C661 /* GGRSSFeedInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSFeedInfo.h; sourceTree = "<group>"; };
+		7E48B74119E185450019C661 /* GGRSSFeedInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSFeedInfo.m; sourceTree = "<group>"; };
+		7E48B74219E185450019C661 /* GGRSSFeedItemInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSFeedItemInfo.h; sourceTree = "<group>"; };
+		7E48B74319E185450019C661 /* GGRSSFeedItemInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSFeedItemInfo.m; sourceTree = "<group>"; };
+		7E48B74419E185450019C661 /* GGRSSFeedParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSFeedParser.h; sourceTree = "<group>"; };
+		7E48B74519E185450019C661 /* GGRSSFeedParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSFeedParser.m; sourceTree = "<group>"; };
 		7E5B890F19D86B8D006FBC8C /* Simple RSS Viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Simple RSS Viewer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E5B891319D86B8E006FBC8C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E5B891419D86B8E006FBC8C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -101,6 +110,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7E48B73F19E1850B0019C661 /* GGRSSFeedsParser */ = {
+			isa = PBXGroup;
+			children = (
+				7E48B74019E185450019C661 /* GGRSSFeedInfo.h */,
+				7E48B74119E185450019C661 /* GGRSSFeedInfo.m */,
+				7E48B74219E185450019C661 /* GGRSSFeedItemInfo.h */,
+				7E48B74319E185450019C661 /* GGRSSFeedItemInfo.m */,
+				7E48B74419E185450019C661 /* GGRSSFeedParser.h */,
+				7E48B74519E185450019C661 /* GGRSSFeedParser.m */,
+			);
+			name = GGRSSFeedsParser;
+			sourceTree = "<group>";
+		};
 		7E5B890619D86B8D006FBC8C = {
 			isa = PBXGroup;
 			children = (
@@ -197,6 +219,7 @@
 				7E5B897619D88696006FBC8C /* Localizable.strings */,
 				7E5B895019D872CF006FBC8C /* Dimensions */,
 				7E5B895619D872F9006FBC8C /* Feeds */,
+				7E48B73F19E1850B0019C661 /* GGRSSFeedsParser */,
 				7E5B895C19D87318006FBC8C /* MWFeedParser */,
 				7E5B896719D8733F006FBC8C /* Categories */,
 			);
@@ -361,8 +384,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E48B74619E185450019C661 /* GGRSSFeedInfo.m in Sources */,
 				7E5B894D19D87228006FBC8C /* GGRSSDetailViewController.m in Sources */,
 				7E5B891819D86B8E006FBC8C /* AppDelegate.m in Sources */,
+				7E48B74719E185450019C661 /* GGRSSFeedItemInfo.m in Sources */,
 				7E5B896419D8732B006FBC8C /* MWFeedParser.m in Sources */,
 				7E5B895B19D8730B006FBC8C /* GGRSSFeedsCollection.m in Sources */,
 				7E5B894B19D87228006FBC8C /* GGRSSAddFeedViewController.m in Sources */,
@@ -371,6 +396,7 @@
 				7E5B894A19D87228006FBC8C /* GGRSSFeedsTableViewController.m in Sources */,
 				7E5B891519D86B8E006FBC8C /* main.m in Sources */,
 				7E5B894C19D87228006FBC8C /* GGRSSMasterViewController.m in Sources */,
+				7E48B74819E185450019C661 /* GGRSSFeedParser.m in Sources */,
 				7E5B896C19D8734A006FBC8C /* NSString+HTML.m in Sources */,
 				7E5B896519D8732B006FBC8C /* MWFeedInfo.m in Sources */,
 				7E5B896D19D8734A006FBC8C /* NSDate+InternetDateTime.m in Sources */,

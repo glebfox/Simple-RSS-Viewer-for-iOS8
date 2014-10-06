@@ -334,7 +334,6 @@
 		[self reset];
 		
 	}
-	
 }
 
 // If an error occurs, create NSError and inform delegate

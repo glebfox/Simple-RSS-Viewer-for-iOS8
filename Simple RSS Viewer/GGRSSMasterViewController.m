@@ -10,16 +10,17 @@
 #import "GGRSSDetailViewController.h"
 #import "GGRSSFeedsCollection.h"
 #import "GGRSSDimensionsProvider.h"
+#import "GGRSSFeedsTableViewController.h"
 #import "GGRSSFeedUrlSource.h"
-#import "MWFeedParser.h"
+#import "GGRSSFeedParser.h"
 #import "NSString+HTML.h"
 
-@interface GGRSSMasterViewController () <MWFeedParserDelegate>
+@interface GGRSSMasterViewController () <GGRSSFeedParserDelegate, UITableViewDelegate, UITableViewDataSource>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 
-@property (strong, nonatomic) MWFeedParser *feedParser;
+@property (strong, nonatomic) GGRSSFeedParser *feedParser;
 @property (strong, nonatomic) NSMutableArray *parsedItems;
 @property (strong, nonatomic) NSDateFormatter *formatter;
 @property (strong, nonatomic) NSArray *itemsToDisplay;
@@ -43,15 +44,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Инициализируем форматтер даты и времени
-    self.formatter = [NSDateFormatter new];
-    [self.formatter setDateStyle:NSDateFormatterShortStyle];
-    [self.formatter setTimeStyle:NSDateFormatterShortStyle];
-    
-    // Иниализируем массивы с элементами для отображения и элементами, которые получаются при парсинге
-    self.parsedItems = [NSMutableArray new];
-    self.itemsToDisplay = [NSArray new];
-    
     // Иниализируем активити индикатор
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
@@ -60,10 +52,7 @@
     // Получаем последний загруженный адрес на фид
     NSURL *feedURL = [[GGRSSFeedsCollection sharedInstance] lastUsedUrl];
     
-    // Стартуем парсер
-    if (feedURL != nil) {
-        [self setParserWithUrl:feedURL];
-    }
+    [self setParserWithUrl:feedURL];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -76,24 +65,22 @@
 // Создает новый парсер с указанным url
 - (void)setParserWithUrl:(NSURL *)url
 {
-    // Обновляем заголовок формы, запускаем анимацию и скрываем таблицу, чтобы было видно анимацию
-    self.title = NSLocalizedString (@"MasterViewTitle_Loading", nil);
-    [self.spinner startAnimating];
-    self.tableView.hidden = YES;
-    
-    // Если не первый запуск, то останавливаем прерыдущий парсинг и обнуляем парсер
-    if (self.feedParser != nil) {
-        [self.feedParser stopParsing];
-        self.feedParser = nil;
-    }
-    
-    // Для непустой ссылки создаем нвоый парсер
     if (url != nil) {
-        self.feedParser = [[MWFeedParser alloc] initWithFeedURL:url];
+        // Обновляем заголовок формы, запускаем анимацию и скрываем таблицу, чтобы было видно анимацию
+        self.title = NSLocalizedString (@"MasterViewTitle_Loading", nil);
+        [self.spinner startAnimating];
+        self.tableView.hidden = YES;
+    
+        // Если не первый запуск, то останавливаем прерыдущий парсинг и обнуляем парсер
+        if (self.feedParser != nil) {
+            [self.feedParser stopParsing];
+            self.feedParser = nil;
+        }
+        
+        self.feedParser = [[GGRSSFeedParser alloc] initWithFeedURL:url];
         self.feedParser.delegate = self;
-        self.feedParser.feedParseType = ParseTypeFull; // Parse feed info and all items
-        self.feedParser.connectionType = ConnectionTypeAsynchronously;
-        [self.parsedItems removeAllObjects];
+        self.parsedItems = nil;
+        self.parsedItems = [NSMutableArray new];
         [self.feedParser parse];
     }
 }
@@ -101,10 +88,14 @@
 // Обвновляем таблицу текущим фидом
 - (void)refresh
 {
-    self.title = NSLocalizedString (@"MasterViewTitle_Refreshing", nil);
-    [self.parsedItems removeAllObjects];
-    [self.feedParser stopParsing];
-    [self.feedParser parse];
+    if (self.feedParser) {
+        self.title = NSLocalizedString (@"MasterViewTitle_Refreshing", nil);
+        [self.parsedItems removeAllObjects];
+        [self.feedParser stopParsing];
+        [self.feedParser parse];
+    } else {
+        [self.refreshControl endRefreshing];
+    }
 }
 
 - (void)updateTableWithParsedItems
@@ -120,47 +111,66 @@
     [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:NO];
 }
 
-#pragma mark - MWFeedParserDelegate
+#pragma mark - GGRSSFeedParserDelegate
 
-- (void)feedParserDidStart:(MWFeedParser *)parser
+- (void)feedParserDidStart:(GGRSSFeedParser *)parser
 {
 //    NSLog(@"Started Parsing: %@", parser.url);
 }
 
-- (void)feedParser:(MWFeedParser *)parser didParseFeedInfo:(MWFeedInfo *)info
+- (void)feedParser:(GGRSSFeedParser *)parser didParseFeedInfo:(GGRSSFeedInfo *)info
 {
 //    NSLog(@"Parsed Feed Info: “%@”", info.title);
     self.title = info.title;
 }
 
-- (void)feedParser:(MWFeedParser *)parser didParseFeedItem:(MWFeedItem *)item
+- (void)feedParser:(GGRSSFeedParser *)parser didParseFeedItem:(GGRSSFeedItemInfo *)item
 {
 //    NSLog(@"Parsed Feed Item: “%@”", item.title);
     if (item) [self.parsedItems addObject:item];
 }
 
-- (void)feedParserDidFinish:(MWFeedParser *)parser
+- (void)feedParserDidFinish:(GGRSSFeedParser *)parser
 {
 //    NSLog(@"Finished Parsing%@", (parser.stopped ? @" (Stopped)" : @""));
+//    NSLog(@"Finished Parsing");
     [[GGRSSFeedsCollection sharedInstance] addFeedWithTitle:self.title absoluteUrlString:[self.feedParser.url absoluteString]];
     [self updateTableWithParsedItems];
 }
 
-- (void)feedParser:(MWFeedParser *)parser didFailWithError:(NSError *)error
+- (void)feedParser:(GGRSSFeedParser *)parser didFailWithError:(NSError *)error
 {
-    // В случае ошибки формируем предупреждение для пользователя
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
-                                            message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
-                                                       delegate:nil
-                                            cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
-                                            otherButtonTitles:nil];
-    // Очищам итемы для отображения, чтобы таблица оказалась пустой
-    if (self.parsedItems.count > 0)
-        [self.parsedItems removeAllObjects];
-    [alert show];
-    self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
-    [self updateTableWithParsedItems];
+//    // В случае ошибки формируем предупреждение для пользователя
+//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
+//                                                    message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
+//                                                   delegate:nil
+//                                          cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
+//                                          otherButtonTitles:nil];
+//    // Очищаем итемы для отображения, чтобы таблица оказалась пустой
+//    if (self.parsedItems.count > 0)
+//        [self.parsedItems removeAllObjects];
+//    [alert show];
+//    self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
+//    [self updateTableWithParsedItems];
+    
+    UIAlertController * alert=   [UIAlertController
+                                  alertControllerWithTitle:@"My Title"
+                                  message:@"Enter User Credentials"
+                                  preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction* cancel = [UIAlertAction
+                             actionWithTitle:@"Cancel"
+                             style:UIAlertActionStyleDefault
+                             handler:^(UIAlertAction * action)
+                             {
+                                 [alert dismissViewControllerAnimated:YES completion:nil];
+                                 
+                             }];
+    [alert addAction:cancel];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
+
 
 #pragma mark - Table view data source
 
@@ -181,36 +191,38 @@
     static NSString *CellIdentider = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentider forIndexPath:indexPath];
     
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentider];
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    }
-    
-    // Configure the cell...
-    MWFeedItem *item = [self.itemsToDisplay objectAtIndex:indexPath.row];
-    if (item) {
-        // Заголовок строки = заголовок новости. Полужирное начертание
-        NSString *itemTitle = item.title ? [item.title stringByConvertingHTMLToPlainText]:NSLocalizedString (@"MasterView_FeedNoTitle", nil);
-        UIFont *font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_TitleSize"]];
+    if (cell != nil) {
+        // Configure the cell...
+        GGRSSFeedItemInfo *item = [self.itemsToDisplay objectAtIndex:indexPath.row];
+        if (item) {
+            // Заголовок строки = заголовок новости. Полужирное начертание
+            NSString *itemTitle = item.title ? [item.title stringByConvertingHTMLToPlainText]:NSLocalizedString (@"MasterView_FeedNoTitle", nil);
+            UIFont *font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_TitleSize"]];
         
-        NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
+            NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
         
-        NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:itemTitle attributes:attributes];
+            NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:itemTitle attributes:attributes];
         
-        // Оставшееся место в заголовке строки заполняем описанием новости. Обычное написание, шрифт поменьше.
-        if (item.summary) {
-            font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_SubtitleSize"]];
-            attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
-            NSMutableAttributedString *summary = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@", [[item.summary stringByConvertingHTMLToPlainText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]] attributes:attributes];
+            // Оставшееся место в заголовке строки заполняем описанием новости. Обычное написание, шрифт поменьше.
+            if (item.summary) {
+                font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_SubtitleSize"]];
+                attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
+                NSMutableAttributedString *summary = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@", [[item.summary stringByConvertingHTMLToPlainText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]] attributes:attributes];
             
-            [title appendAttributedString:summary];
-        }
+                [title appendAttributedString:summary];
+            }
         
-        cell.textLabel.attributedText = title;
+            cell.textLabel.attributedText = title;
         
-        // Подзаголовок строки = дата новости
-        if (item.date) {
-            cell.detailTextLabel.text = [NSString stringWithFormat:@"%@", [self.formatter stringFromDate:item.date]];
+            // Подзаголовок строки = дата новости
+            if (item.date) {
+                // Инициализируем форматтер даты и времени
+                self.formatter = [NSDateFormatter new];
+                [self.formatter setDateStyle:NSDateFormatterShortStyle];
+                [self.formatter setTimeStyle:NSDateFormatterShortStyle];
+            
+                cell.detailTextLabel.text = [NSString stringWithFormat:@"%@", [self.formatter stringFromDate:item.date]];
+            }
         }
     }
     
@@ -225,9 +237,15 @@
     // Если мы переходим к детальному представлению, то передаем ему информацию по выбранной новости
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        MWFeedItem *item = self.itemsToDisplay[indexPath.row];
+        GGRSSFeedItemInfo *item = self.itemsToDisplay[indexPath.row];
         if ([segue.destinationViewController class] == [GGRSSDetailViewController class]) {
             [segue.destinationViewController setDetailItem:item];
+        }
+    }
+    
+    if ([[segue identifier] isEqualToString:@"showFeeds"]) {
+        if ([segue.destinationViewController class] == [GGRSSFeedsTableViewController class]) {
+            [segue.destinationViewController setFeedsToDisplay:[[GGRSSFeedsCollection sharedInstance] allFeeds]];
         }
     }
     
