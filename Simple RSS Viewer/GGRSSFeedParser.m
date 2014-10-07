@@ -177,7 +177,7 @@
                 
                 // Parse!
                 self.xmlParser.delegate = self;
-                [self.xmlParser setShouldProcessNamespaces:YES];
+//                [self.xmlParser setShouldProcessNamespaces:YES];
                 [self.xmlParser parse];
                 self.xmlParser = nil; // Release after parse
                 

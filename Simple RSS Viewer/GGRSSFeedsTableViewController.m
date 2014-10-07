@@ -11,6 +11,8 @@
 #import "GGRSSDimensionsProvider.h"
 #import "GGRSSMasterViewController.h"
 
+NSString *observerKey = @"feeds";
+
 @interface GGRSSFeedsTableViewController ()
 
 @end
@@ -18,6 +20,16 @@
 @implementation GGRSSFeedsTableViewController
 
 @synthesize url;
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:observerKey];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -45,14 +57,19 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentider forIndexPath:indexPath];
     
     if (cell != nil) {
-    
+        GGRSSFeedInfo *info = self.feedsToDisplay[indexPath.row];
+        
         // Заголовок будет хранить название фида
         cell.textLabel.font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_TitleSize"]];
-        cell.textLabel.text = self.feedsToDisplay[indexPath.row][0];
+        cell.textLabel.text = info.title;
     
         // Подзаголовок будет хранить адрес фида
         cell.detailTextLabel.font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_SubtitleSize"]];
-        cell.detailTextLabel.text = self.feedsToDisplay[indexPath.row][1];
+        cell.detailTextLabel.text = [info.url absoluteString];
+        
+        if ([[[GGRSSFeedsCollection sharedInstance] lastUsedUrl] isEqual:info.url]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        }
     }
     
     return cell;
@@ -68,12 +85,21 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Удаляем выбранную строку с формы и из ресурсов
-        [[GGRSSFeedsCollection sharedInstance] deleteFeedAtIndex:indexPath.row];
-        self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
-        [tableView reloadData];
+        GGRSSFeedInfo *info = self.feedsToDisplay[indexPath.row];
+        [[GGRSSFeedsCollection sharedInstance] deleteFeedWithTitle:info.title];
+//        self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
+//        [tableView reloadData];
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
     }   
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:observerKey]) {
+        self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
+        [self.tableView reloadData];
+    }
 }
 
 #pragma mark - Navigation
@@ -91,8 +117,8 @@
         // В остальныйх случая считываем адресс фида с ячейки
         UITableViewCell *cell = sender;
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-        self.url = self.feedsToDisplay[indexPath.row][1];
-//        self.url = [NSURL URLWithString:cell.detailTextLabel.text];
+        GGRSSFeedInfo *info = self.feedsToDisplay[indexPath.row];
+        self.url = info.url;
     }
 }
 

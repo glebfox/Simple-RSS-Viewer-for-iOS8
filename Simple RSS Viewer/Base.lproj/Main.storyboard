@@ -3,7 +3,6 @@
     <dependencies>
         <deployment defaultVersion="1808" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Master View Controller-->
@@ -59,12 +58,12 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="vAu-6u-rpp" firstAttribute="top" secondItem="VJ6-a1-OC3" secondAttribute="bottom" id="BEY-bQ-apa"/>
+                            <constraint firstItem="VJ6-a1-OC3" firstAttribute="top" secondItem="MHb-l8-Pky" secondAttribute="top" id="1HX-71-lkH"/>
+                            <constraint firstItem="VJ6-a1-OC3" firstAttribute="leading" secondItem="MHb-l8-Pky" secondAttribute="leading" id="9cr-ok-QUw"/>
                             <constraint firstAttribute="centerX" secondItem="3bL-hu-WXK" secondAttribute="centerX" id="Oxs-Q9-seK"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="VJ6-a1-OC3" secondAttribute="trailing" constant="-16" id="RPB-CL-5AY"/>
-                            <constraint firstItem="VJ6-a1-OC3" firstAttribute="top" secondItem="MHb-l8-Pky" secondAttribute="topMargin" id="bhp-Q2-mX3"/>
-                            <constraint firstItem="VJ6-a1-OC3" firstAttribute="leading" secondItem="MHb-l8-Pky" secondAttribute="leadingMargin" constant="-16" id="m41-gM-uWP"/>
+                            <constraint firstAttribute="trailing" secondItem="VJ6-a1-OC3" secondAttribute="trailing" id="gvN-cn-HSV"/>
                             <constraint firstAttribute="centerY" secondItem="3bL-hu-WXK" secondAttribute="centerY" id="wxq-fK-dqC"/>
+                            <constraint firstItem="vAu-6u-rpp" firstAttribute="top" secondItem="VJ6-a1-OC3" secondAttribute="bottom" id="zwi-19-p9M"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="wdJ-iV-B5q">
@@ -146,26 +145,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="dJ8-Iz-8YB">
+                                <rect key="frame" x="16" y="144" width="568" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Feed URL" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7ug-0A-Enx">
                                 <rect key="frame" x="16" y="115" width="568" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="dJ8-Iz-8YB">
-                                <rect key="frame" x="16" y="144" width="568" height="30"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="7ug-0A-Enx" firstAttribute="trailing" secondItem="bmW-iU-9Tv" secondAttribute="trailingMargin" id="B6P-RQ-huZ"/>
-                            <constraint firstItem="7ug-0A-Enx" firstAttribute="leading" secondItem="bmW-iU-9Tv" secondAttribute="leadingMargin" id="EOf-NI-Jje"/>
-                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="top" secondItem="7ug-0A-Enx" secondAttribute="bottom" constant="8.5" id="OmP-5e-8UW"/>
-                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="trailing" secondItem="bmW-iU-9Tv" secondAttribute="trailingMargin" id="cEt-5S-FZu"/>
-                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="leading" secondItem="bmW-iU-9Tv" secondAttribute="leadingMargin" id="fVO-UU-NFf"/>
-                            <constraint firstItem="7ug-0A-Enx" firstAttribute="top" secondItem="ijZ-ZK-ZbQ" secondAttribute="bottom" constant="51" id="yUo-qV-i1g"/>
+                            <constraint firstAttribute="trailing" secondItem="7ug-0A-Enx" secondAttribute="trailing" constant="16" id="56H-Kc-Hfr"/>
+                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="top" secondItem="7ug-0A-Enx" secondAttribute="bottom" constant="8.5" id="6fb-zt-orY"/>
+                            <constraint firstItem="7ug-0A-Enx" firstAttribute="leading" secondItem="bmW-iU-9Tv" secondAttribute="leading" constant="16" id="7cJ-Cw-quf"/>
+                            <constraint firstAttribute="trailing" secondItem="dJ8-Iz-8YB" secondAttribute="trailing" constant="16" id="DIC-Sv-Gfo"/>
+                            <constraint firstItem="7ug-0A-Enx" firstAttribute="top" secondItem="ijZ-ZK-ZbQ" secondAttribute="bottom" constant="51" id="HGr-9Z-fI9"/>
+                            <constraint firstItem="dJ8-Iz-8YB" firstAttribute="leading" secondItem="bmW-iU-9Tv" secondAttribute="leading" constant="16" id="bxF-J2-cYc"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Add Feed" id="ZhL-Jg-IiJ">
@@ -209,6 +208,7 @@
                         </attributedString>
                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                     </textView>
+                    <navigationItem key="navigationItem" id="a8S-Ya-FVL"/>
                     <connections>
                         <outlet property="textView" destination="757-Mm-T7a" id="6qU-Ye-QKf"/>
                     </connections>

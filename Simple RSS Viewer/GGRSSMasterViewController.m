@@ -15,6 +15,8 @@
 #import "GGRSSFeedParser.h"
 #import "NSString+HTML.h"
 
+NSString *observerKey = @"feeds";
+
 @interface GGRSSMasterViewController () <GGRSSFeedParserDelegate, UITableViewDelegate, UITableViewDataSource>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -26,6 +28,8 @@
 @property (strong, nonatomic) NSArray *itemsToDisplay;
 
 @property (nonatomic,retain) UIRefreshControl *refreshControl;
+
+@property BOOL isNewFeedParsing;
 
 @end
 
@@ -51,7 +55,7 @@
     
     // Получаем последний загруженный адрес на фид
     NSURL *feedURL = [[GGRSSFeedsCollection sharedInstance] lastUsedUrl];
-    
+    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
     [self setParserWithUrl:feedURL];
 }
 
@@ -81,7 +85,10 @@
         self.feedParser.delegate = self;
         self.parsedItems = nil;
         self.parsedItems = [NSMutableArray new];
+        self.isNewFeedParsing = YES;
         [self.feedParser parse];
+    } else {
+        
     }
 }
 
@@ -92,6 +99,7 @@
         self.title = NSLocalizedString (@"MasterViewTitle_Refreshing", nil);
         [self.parsedItems removeAllObjects];
         [self.feedParser stopParsing];
+        self.isNewFeedParsing = NO;
         [self.feedParser parse];
     } else {
         [self.refreshControl endRefreshing];
@@ -116,11 +124,16 @@
 - (void)feedParserDidStart:(GGRSSFeedParser *)parser
 {
 //    NSLog(@"Started Parsing: %@", parser.url);
+    [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:self.feedParser.url];
 }
 
 - (void)feedParser:(GGRSSFeedParser *)parser didParseFeedInfo:(GGRSSFeedInfo *)info
 {
 //    NSLog(@"Parsed Feed Info: “%@”", info.title);
+    if (self.isNewFeedParsing) {
+        [[GGRSSFeedsCollection sharedInstance] addFeedWithTitle:info.title url:[info.url absoluteString]];
+        self.isNewFeedParsing = NO;
+    }
     self.title = info.title;
 }
 
@@ -134,41 +147,41 @@
 {
 //    NSLog(@"Finished Parsing%@", (parser.stopped ? @" (Stopped)" : @""));
 //    NSLog(@"Finished Parsing");
-    [[GGRSSFeedsCollection sharedInstance] addFeedWithTitle:self.title absoluteUrlString:[self.feedParser.url absoluteString]];
     [self updateTableWithParsedItems];
 }
 
 - (void)feedParser:(GGRSSFeedParser *)parser didFailWithError:(NSError *)error
 {
-//    // В случае ошибки формируем предупреждение для пользователя
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
-//                                                    message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
-//                                                   delegate:nil
-//                                          cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
-//                                          otherButtonTitles:nil];
-//    // Очищаем итемы для отображения, чтобы таблица оказалась пустой
-//    if (self.parsedItems.count > 0)
-//        [self.parsedItems removeAllObjects];
-//    [alert show];
-//    self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
-//    [self updateTableWithParsedItems];
+    // В случае ошибки формируем предупреждение для пользователя
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
+                                                    message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
+                                                   delegate:nil
+                                          cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
+                                          otherButtonTitles:nil];
+    // Очищаем итемы для отображения, чтобы таблица оказалась пустой
+    if (self.parsedItems.count > 0)
+        [self.parsedItems removeAllObjects];
+    [alert show];
+    self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
+    [self updateTableWithParsedItems];
+    [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
     
-    UIAlertController * alert=   [UIAlertController
-                                  alertControllerWithTitle:@"My Title"
-                                  message:@"Enter User Credentials"
-                                  preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction* cancel = [UIAlertAction
-                             actionWithTitle:@"Cancel"
-                             style:UIAlertActionStyleDefault
-                             handler:^(UIAlertAction * action)
-                             {
-                                 [alert dismissViewControllerAnimated:YES completion:nil];
-                                 
-                             }];
-    [alert addAction:cancel];
-    
-    [self presentViewController:alert animated:YES completion:nil];
+//    UIAlertController * alert=   [UIAlertController
+//                                  alertControllerWithTitle:@"My Title"
+//                                  message:@"Enter User Credentials"
+//                                  preferredStyle:UIAlertControllerStyleAlert];
+//    
+//    UIAlertAction* cancel = [UIAlertAction
+//                             actionWithTitle:@"Cancel"
+//                             style:UIAlertActionStyleDefault
+//                             handler:^(UIAlertAction * action)
+//                             {
+//                                 [alert dismissViewControllerAnimated:YES completion:nil];
+//                                 
+//                             }];
+//    [alert addAction:cancel];
+//    
+//    [self presentViewController:alert animated:YES completion:nil];
 }
 
 
@@ -227,6 +240,18 @@
     }
     
     return cell;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:observerKey]) {
+        NSArray *feeds = [[GGRSSFeedsCollection sharedInstance] allFeeds];
+        if (feeds == nil || feeds.count == 0) {
+            [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
+            self.itemsToDisplay = nil;
+            [self.tableView reloadData];
+        }
+    }
 }
 
 #pragma mark - Navigation

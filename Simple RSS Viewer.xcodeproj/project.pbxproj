@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E175AE919E3B99000959725 /* FeedsUrl.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7E175AE819E3B99000959725 /* FeedsUrl.plist */; };
+		7E175AEB19E3C46100959725 /* FeedsLastUrl.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7E175AEA19E3C46100959725 /* FeedsLastUrl.plist */; };
 		7E48B74619E185450019C661 /* GGRSSFeedInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E48B74119E185450019C661 /* GGRSSFeedInfo.m */; };
 		7E48B74719E185450019C661 /* GGRSSFeedItemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E48B74319E185450019C661 /* GGRSSFeedItemInfo.m */; };
 		7E48B74819E185450019C661 /* GGRSSFeedParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E48B74519E185450019C661 /* GGRSSFeedParser.m */; };
@@ -21,7 +23,6 @@
 		7E5B894D19D87228006FBC8C /* GGRSSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B894919D87228006FBC8C /* GGRSSDetailViewController.m */; };
 		7E5B895419D872DB006FBC8C /* Dimensions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7E5B895119D872DB006FBC8C /* Dimensions.plist */; };
 		7E5B895519D872DB006FBC8C /* GGRSSDimensionsProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B895319D872DB006FBC8C /* GGRSSDimensionsProvider.m */; };
-		7E5B895A19D8730B006FBC8C /* FeedsUrl.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7E5B895719D8730B006FBC8C /* FeedsUrl.plist */; };
 		7E5B895B19D8730B006FBC8C /* GGRSSFeedsCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B895919D8730B006FBC8C /* GGRSSFeedsCollection.m */; };
 		7E5B896419D8732B006FBC8C /* MWFeedParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B895F19D8732B006FBC8C /* MWFeedParser.m */; };
 		7E5B896519D8732B006FBC8C /* MWFeedInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B896119D8732B006FBC8C /* MWFeedInfo.m */; };
@@ -43,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7E175AE819E3B99000959725 /* FeedsUrl.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = FeedsUrl.plist; sourceTree = "<group>"; };
+		7E175AEA19E3C46100959725 /* FeedsLastUrl.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = FeedsLastUrl.plist; sourceTree = "<group>"; };
 		7E48B74019E185450019C661 /* GGRSSFeedInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSFeedInfo.h; sourceTree = "<group>"; };
 		7E48B74119E185450019C661 /* GGRSSFeedInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSFeedInfo.m; sourceTree = "<group>"; };
 		7E48B74219E185450019C661 /* GGRSSFeedItemInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSFeedItemInfo.h; sourceTree = "<group>"; };
@@ -71,7 +74,6 @@
 		7E5B895119D872DB006FBC8C /* Dimensions.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Dimensions.plist; sourceTree = "<group>"; };
 		7E5B895219D872DB006FBC8C /* GGRSSDimensionsProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSDimensionsProvider.h; sourceTree = "<group>"; };
 		7E5B895319D872DB006FBC8C /* GGRSSDimensionsProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSDimensionsProvider.m; sourceTree = "<group>"; };
-		7E5B895719D8730B006FBC8C /* FeedsUrl.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = FeedsUrl.plist; sourceTree = "<group>"; };
 		7E5B895819D8730B006FBC8C /* GGRSSFeedsCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSFeedsCollection.h; sourceTree = "<group>"; };
 		7E5B895919D8730B006FBC8C /* GGRSSFeedsCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSFeedsCollection.m; sourceTree = "<group>"; };
 		7E5B895D19D8732B006FBC8C /* MWFeedParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MWFeedParser.h; sourceTree = "<group>"; };
@@ -217,9 +219,9 @@
 			isa = PBXGroup;
 			children = (
 				7E5B897619D88696006FBC8C /* Localizable.strings */,
+				7E48B73F19E1850B0019C661 /* GGRSSFeedsParser */,
 				7E5B895019D872CF006FBC8C /* Dimensions */,
 				7E5B895619D872F9006FBC8C /* Feeds */,
-				7E48B73F19E1850B0019C661 /* GGRSSFeedsParser */,
 				7E5B895C19D87318006FBC8C /* MWFeedParser */,
 				7E5B896719D8733F006FBC8C /* Categories */,
 			);
@@ -239,7 +241,8 @@
 		7E5B895619D872F9006FBC8C /* Feeds */ = {
 			isa = PBXGroup;
 			children = (
-				7E5B895719D8730B006FBC8C /* FeedsUrl.plist */,
+				7E175AE819E3B99000959725 /* FeedsUrl.plist */,
+				7E175AEA19E3C46100959725 /* FeedsLastUrl.plist */,
 				7E5B895819D8730B006FBC8C /* GGRSSFeedsCollection.h */,
 				7E5B895919D8730B006FBC8C /* GGRSSFeedsCollection.m */,
 			);
@@ -364,7 +367,8 @@
 			files = (
 				7E5B891E19D86B8E006FBC8C /* Main.storyboard in Resources */,
 				7E5B897419D88696006FBC8C /* Localizable.strings in Resources */,
-				7E5B895A19D8730B006FBC8C /* FeedsUrl.plist in Resources */,
+				7E175AEB19E3C46100959725 /* FeedsLastUrl.plist in Resources */,
+				7E175AE919E3B99000959725 /* FeedsUrl.plist in Resources */,
 				7E5B895419D872DB006FBC8C /* Dimensions.plist in Resources */,
 				7E5B892019D86B8E006FBC8C /* Images.xcassets in Resources */,
 			);
@@ -515,6 +519,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};

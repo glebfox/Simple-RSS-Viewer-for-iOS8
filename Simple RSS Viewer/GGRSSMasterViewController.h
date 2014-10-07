@@ -10,6 +10,6 @@
 
 @interface GGRSSMasterViewController : UIViewController
 
-- (void)setParserWithUrl:(NSURL *)url;
+//- (void)setParserWithUrl:(NSURL *)url;
 
 @end

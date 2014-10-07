@@ -8,10 +8,11 @@
 
 #import "GGRSSFeedsCollection.h"
 
-@interface GGRSSFeedsCollection ()
+@interface GGRSSFeedsCollection () {
+    NSURL *_lastUsedUrl;
+}
 
-@property(nonatomic, retain) NSString *path;
-@property(nonatomic, retain) NSMutableArray *feeds;
+@property(nonatomic, retain) NSMutableDictionary *feeds;
 
 @end
 
@@ -33,60 +34,102 @@
     self = [super init];
     
     if (self) {
-        self.path = [[NSBundle mainBundle] pathForResource:@"FeedsUrl" ofType:@"plist"];
-        self.feeds = [NSMutableArray arrayWithContentsOfFile:self.path];
-        
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsUrl" ofType:@"plist"];
+        self.feeds = [NSMutableDictionary dictionaryWithContentsOfFile:path];
     }
     return self;
 }
 
--(NSURL *) lastUsedUrl
+- (NSURL *) lastUsedUrl
 {
-    if (self.feeds.count != 0) {
-        return [NSURL URLWithString:self.feeds[0][1]];
-    }
-    return nil;
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsLastUrl" ofType:@"plist"];
+    NSArray *url = [NSArray arrayWithContentsOfFile:path];
+    _lastUsedUrl = url.count != 0 ? [NSURL URLWithString:url[0]] : nil;
+    
+    return _lastUsedUrl;
 }
 
-- (void)addFeedWithTitle:(NSString *)title absoluteUrlString:(NSString *)urlString
+- (void) setLastUsedUrl:(NSURL *)url
 {
-    if (self.feeds.count > 0) {
-        if ([self.feeds[0][1] isEqualToString:urlString]) {
-            return;
-        }
+    if (![url isEqual:_lastUsedUrl]) {
+        _lastUsedUrl = url;
         
-        for (int i = 0; i < self.feeds.count; i++) {
-            if ([self.feeds[i][1] isEqualToString:urlString]) {
-                [self.feeds removeObjectAtIndex:i];
-            }
+        NSError *error;
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsLastUrl" ofType:@"plist"];
+        NSData *xmlData = [NSPropertyListSerialization dataWithPropertyList:@[[url absoluteString]] format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
+        
+        if(xmlData) {
+            [xmlData writeToFile:path atomically:YES];
+        }
+        else {
+            NSLog(@"%@", error);
         }
     }
+}
+
+- (void)addFeedWithTitle:(NSString *)title url:(NSString *)urlString
+{
+    NSLog(@"addFeedWithTitle");
+    NSString *value = self.feeds[title];
+    if (value == nil || ![value isEqualToString:urlString]) {
+        NSLog(@"addFeedWithTitle - added");
+        [self willChangeValueForKey:@"feeds"];
+        [self.feeds setObject:urlString forKey:title];
+        [self saveFeeds];
+        [self didChangeValueForKey:@"feeds"];
+    }
+}
+
+- (void)deleteFeedWithTitle:(NSString *)title
+{
+    [self willChangeValueForKey:@"feeds"];
+    [self.feeds removeObjectForKey:title];
+    [self saveFeeds];
+    [self didChangeValueForKey:@"feeds"];
     
-    [self.feeds insertObject:@[title, urlString] atIndex:0];
 }
 
 - (NSArray *)allFeeds
 {
-    return [self.feeds copy];
+    NSArray *keys = [self.feeds allKeys];
+    if (keys.count > 0) {
+        NSMutableArray *feeds = [NSMutableArray new];
+        
+        for (NSString *key in keys) {
+            GGRSSFeedInfo *info = [GGRSSFeedInfo new];
+            info.title = key;
+            info.url = [NSURL URLWithString:self.feeds[key]];
+            [feeds addObject:info];
+        }
+        
+        return [feeds copy];
+    }
+    
+    return nil;
 }
 
 - (void)saveFeeds
 {
     NSError *error;
     
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsUrl" ofType:@"plist"];
     NSData *xmlData = [NSPropertyListSerialization dataWithPropertyList:self.feeds format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
     
     if(xmlData) {
-        [xmlData writeToFile:self.path atomically:YES];
+        [xmlData writeToFile:path atomically:YES];
     }
     else {
         NSLog(@"%@", error);
     }
 }
 
-- (void)deleteFeedAtIndex:(NSUInteger)index
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {
-    [self.feeds removeObjectAtIndex:index];
+    if ([key isEqualToString:@"feeds"]) {
+        return NO;
+    } else {
+        return [super automaticallyNotifiesObserversForKey:key];
+    }
 }
 
 @end

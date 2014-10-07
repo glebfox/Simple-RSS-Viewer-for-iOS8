@@ -15,8 +15,8 @@
 - (NSString *)description {
     NSMutableString *string = [[NSMutableString alloc] initWithString:@"GGRSSFeedInfo: "];
     if (self.title)   [string appendFormat:@"“%@”", self.title];
-    //if (self.link)    [string appendFormat:@" (%@)", link];
-    //if (self.summary) [string appendFormat:@", %@", summary];
+    if (self.url)    [string appendFormat:@" (%@)", self.url];
+    //if (self.summary) [string appendFormat:@", %@", self.summary];
     return string;
 }
 
