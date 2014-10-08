@@ -15,7 +15,7 @@
 #import "GGRSSFeedParser.h"
 #import "NSString+HTML.h"
 
-NSString *observerKey = @"feeds";
+NSString *oKey = @"feeds";
 
 @interface GGRSSMasterViewController () <GGRSSFeedParserDelegate, UITableViewDelegate, UITableViewDataSource>
 
@@ -55,7 +55,7 @@ NSString *observerKey = @"feeds";
     
     // Получаем последний загруженный адрес на фид
     NSURL *feedURL = [[GGRSSFeedsCollection sharedInstance] lastUsedUrl];
-    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
+    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:oKey options:NSKeyValueObservingOptionNew context:nil];
     [self setParserWithUrl:feedURL];
 }
 
@@ -244,14 +244,31 @@ NSString *observerKey = @"feeds";
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if ([keyPath isEqualToString:observerKey]) {
-        NSArray *feeds = [[GGRSSFeedsCollection sharedInstance] allFeeds];
-        if (feeds == nil || feeds.count == 0) {
+    if ([keyPath isEqualToString:oKey]) {
+        if ([self lastUsedFeedDeleted]) {
             [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
             self.itemsToDisplay = nil;
+            self.feedParser = nil;
+            self.title = @"";
             [self.tableView reloadData];
         }
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
+}
+
+- (BOOL)lastUsedFeedDeleted
+{
+    NSArray *feeds = [[GGRSSFeedsCollection sharedInstance] allFeeds];
+    if (feeds == nil || feeds.count == 0) return YES;
+    
+    for (GGRSSFeedInfo *feed in feeds) {
+        if ([feed.url isEqual:self.feedParser.url]) {
+            return NO;
+        }
+    }
+    
+    return YES;
 }
 
 #pragma mark - Navigation

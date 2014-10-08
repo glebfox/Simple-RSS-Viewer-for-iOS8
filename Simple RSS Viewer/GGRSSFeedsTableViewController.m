@@ -21,11 +21,6 @@ NSString *observerKey = @"feeds";
 
 @synthesize url;
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
-}
-
 - (void)viewWillDisappear:(BOOL)animated
 {
     [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:observerKey];
@@ -33,6 +28,7 @@ NSString *observerKey = @"feeds";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -99,6 +95,8 @@ NSString *observerKey = @"feeds";
     if ([keyPath isEqualToString:observerKey]) {
         self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
         [self.tableView reloadData];
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
 

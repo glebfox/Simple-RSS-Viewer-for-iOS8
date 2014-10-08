@@ -44,7 +44,8 @@
 {
     NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsLastUrl" ofType:@"plist"];
     NSArray *url = [NSArray arrayWithContentsOfFile:path];
-    _lastUsedUrl = url.count != 0 ? [NSURL URLWithString:url[0]] : nil;
+    NSString *urlStrind = url[0];
+    _lastUsedUrl = urlStrind.length > 0 ? [NSURL URLWithString:url[0]] : nil;
     
     return _lastUsedUrl;
 }
@@ -52,11 +53,17 @@
 - (void) setLastUsedUrl:(NSURL *)url
 {
     if (![url isEqual:_lastUsedUrl]) {
+        NSString *urlString;
+        if (url == nil) {
+            urlString = @"";
+        } else {
+            urlString = [url absoluteString];
+        }
         _lastUsedUrl = url;
         
         NSError *error;
         NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsLastUrl" ofType:@"plist"];
-        NSData *xmlData = [NSPropertyListSerialization dataWithPropertyList:@[[url absoluteString]] format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
+        NSData *xmlData = [NSPropertyListSerialization dataWithPropertyList:@[urlString] format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
         
         if(xmlData) {
             [xmlData writeToFile:path atomically:YES];
@@ -69,10 +76,11 @@
 
 - (void)addFeedWithTitle:(NSString *)title url:(NSString *)urlString
 {
-    NSLog(@"addFeedWithTitle");
+//    NSLog(@"addFeedWithTitle - %@", self.observationInfo);
+//    NSLog(@"addFeedWithTitle");
     NSString *value = self.feeds[title];
     if (value == nil || ![value isEqualToString:urlString]) {
-        NSLog(@"addFeedWithTitle - added");
+//        NSLog(@"addFeedWithTitle - added");
         [self willChangeValueForKey:@"feeds"];
         [self.feeds setObject:urlString forKey:title];
         [self saveFeeds];
@@ -82,6 +90,7 @@
 
 - (void)deleteFeedWithTitle:(NSString *)title
 {
+//    NSLog(@"deleteFeedWithTitle - %@", self.observationInfo);
     [self willChangeValueForKey:@"feeds"];
     [self.feeds removeObjectForKey:title];
     [self saveFeeds];
