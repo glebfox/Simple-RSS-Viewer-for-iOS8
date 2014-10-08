@@ -22,11 +22,11 @@
 @property (nonatomic, strong) NSMutableData *asyncData;
 
 // Parsing Properties
-@property NSXMLParser *xmlParser;
-@property GGRSSFeedInfo *feedInfo;
-@property GGRSSFeedItemInfo *currentFeedItemInfo;
-@property NSMutableString *foundCharacters;
-@property BOOL isItem;
+@property (nonatomic, strong) NSXMLParser *xmlParser;
+@property (nonatomic, strong) GGRSSFeedInfo *feedInfo;
+@property (nonatomic, strong) GGRSSFeedItemInfo *currentFeedItemInfo;
+@property (nonatomic, strong) NSMutableString *foundCharacters;
+@property (nonatomic) BOOL isItem;
 
 @property NSDateFormatter *dateFormatterRFC822;
 

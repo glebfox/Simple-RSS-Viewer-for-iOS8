@@ -12,7 +12,7 @@
     NSURL *_lastUsedUrl;
 }
 
-@property(nonatomic, retain) NSMutableDictionary *feeds;
+@property(nonatomic, strong) NSMutableDictionary *feeds;
 
 @end
 

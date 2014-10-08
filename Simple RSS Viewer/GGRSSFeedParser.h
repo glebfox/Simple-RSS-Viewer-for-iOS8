@@ -24,7 +24,7 @@
 
 @interface GGRSSFeedParser : NSObject
 
-@property (nonatomic, unsafe_unretained) id <GGRSSFeedParserDelegate> delegate;
+@property (nonatomic, weak) id <GGRSSFeedParserDelegate> delegate;
 
 - (id)initWithFeedURL:(NSURL *)feedURL;
 - (BOOL)parse;

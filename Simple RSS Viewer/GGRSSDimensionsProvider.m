@@ -11,7 +11,7 @@
 
 @interface GGRSSDimensionsProvider ()
 
-@property(nonatomic, retain) NSDictionary *dimensions;
+@property(nonatomic, strong) NSDictionary *dimensions;
 
 @end
 

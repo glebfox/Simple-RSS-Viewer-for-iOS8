@@ -11,6 +11,6 @@
 
 @interface GGRSSFeedsTableViewController : UITableViewController <GGRSSFeedUrlSource>
 
-@property NSArray *feedsToDisplay;   // Список фидов для отображения
+@property (nonatomic, strong) NSArray *feedsToDisplay;   // Список фидов для отображения
 
 @end

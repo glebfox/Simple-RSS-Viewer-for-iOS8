@@ -27,9 +27,9 @@ NSString *oKey = @"feeds";
 @property (strong, nonatomic) NSDateFormatter *formatter;
 @property (strong, nonatomic) NSArray *itemsToDisplay;
 
-@property (nonatomic,retain) UIRefreshControl *refreshControl;
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 
-@property BOOL isNewFeedParsing;
+@property (nonatomic) BOOL isNewFeedParsing;
 
 @end
 

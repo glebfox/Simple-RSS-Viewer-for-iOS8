@@ -13,7 +13,7 @@
 @interface GGRSSDetailViewController ()
 
 @property (weak, nonatomic) IBOutlet UITextView *textView;
-@property NSAttributedString *detailText;
+@property (nonatomic, strong) NSAttributedString *detailText;
 
 @end
 
