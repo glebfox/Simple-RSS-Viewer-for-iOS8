@@ -7,6 +7,7 @@
 //
 
 #import "GGRSSFeedParser.h"
+#import "NSDate+InternetDateTime.h"
 
 #define GGRSSErrorCodeNotInitiated      1
 #define GGRSSErrorCodeConnectionFailed  2
@@ -27,9 +28,24 @@
 @property NSMutableString *foundCharacters;
 @property BOOL isItem;
 
+@property NSDateFormatter *dateFormatterRFC822;
+
 @end
 
 @implementation GGRSSFeedParser
+
+- (id)init
+{
+    if ((self = [super init])) {
+        // Date Formatters
+        // Good info on internet dates here: http://developer.apple.com/iphone/library/qa/qa2010/qa1480.html
+        NSLocale *en_US_POSIX = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        self.dateFormatterRFC822 = [[NSDateFormatter alloc] init];
+        [self.dateFormatterRFC822 setLocale:en_US_POSIX];
+        [self.dateFormatterRFC822 setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    }
+    return self;
+}
 
 // Initialise with a URL
 - (id)initWithFeedURL:(NSURL *)feedURL {
@@ -203,7 +219,8 @@
     }
     
     if ([elementName isEqualToString:@"pubDate"]) {
-        //        if (self.isItem) self.currentFeedItemInfo.date = [NSDateFormatter da] self.foundCharacters;
+        NSDate *date = [NSDate dateFromInternetDateTimeString:self.foundCharacters formatHint:DateFormatHintRFC822];
+                if (self.isItem) self.currentFeedItemInfo.date = date;
     }
     
     if ([elementName isEqualToString:@"item"]) {
