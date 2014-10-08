@@ -1,24 +1,24 @@
 
-/* Class = "IBUITableViewSection"; headerTitle = "Feed URL"; ObjectID = "66O-kQ-knq"; */
-"66O-kQ-knq.headerTitle" = "URL Ленты";
+/* Class = "IBUILabel"; text = "Feed URL"; ObjectID = "7ug-0A-Enx"; */
+"7ug-0A-Enx.text" = "URL Канала";
 
 /* Class = "IBUILabel"; text = "Subtitle"; ObjectID = "CQY-Zy-y3D"; */
 "CQY-Zy-y3D.text" = "Подзаголовок";
 
 /* Class = "IBUINavigationItem"; title = "Feeds"; ObjectID = "ODd-Gs-V57"; */
-"ODd-Gs-V57.title" = "Ленты";
+"ODd-Gs-V57.title" = "Каналы";
 
 /* Class = "IBUIBarButtonItem"; title = "Feeds"; ObjectID = "SC5-ct-oyY"; */
-"SC5-ct-oyY.title" = "Ленты";
+"SC5-ct-oyY.title" = "Каналы";
 
 /* Class = "IBUILabel"; text = "Title"; ObjectID = "W7B-W7-SLj"; */
 "W7B-W7-SLj.text" = "Заголовок";
+
+/* Class = "IBUINavigationItem"; title = "Add Feed"; ObjectID = "ZhL-Jg-IiJ"; */
+"ZhL-Jg-IiJ.title" = "Добавить канал";
 
 /* Class = "IBUILabel"; text = "Title"; ObjectID = "l7j-op-sZc"; */
 "l7j-op-sZc.text" = "Заголовок";
 
 /* Class = "IBUILabel"; text = "Subtitle"; ObjectID = "sa7-jh-Qi7"; */
 "sa7-jh-Qi7.text" = "Подзаголовок";
-
-/* Class = "IBUINavigationItem"; title = "Add Feed"; ObjectID = "smJ-1d-QOW"; */
-"smJ-1d-QOW.title" = "Добавить ленту";

@@ -8,8 +8,9 @@
 
 #import "GGRSSFeedParser.h"
 
-#define GGRSSErrorCodeConnectionFailed 1
-#define GGRSSErrorCodeXmlParsingError 2
+#define GGRSSErrorCodeNotInitiated      1
+#define GGRSSErrorCodeConnectionFailed  2
+#define GGRSSErrorCodeXmlParsingError   3
 
 @interface GGRSSFeedParser () <NSXMLParserDelegate>
 
@@ -74,6 +75,11 @@
 
 // Parse using URL for backwards compatibility
 - (BOOL)parse {
+    
+    if (!self.url || !self.delegate) {
+        [self parsingFailedWithErrorCode:GGRSSErrorCodeNotInitiated andDescription:@"Delegate or URL not specified"];
+        return NO;
+    }
     
     // Reset
     [self reset];

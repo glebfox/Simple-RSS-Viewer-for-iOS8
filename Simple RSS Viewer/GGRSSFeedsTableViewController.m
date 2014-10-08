@@ -28,6 +28,7 @@ NSString *observerKey = @"feeds";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
 }
 
@@ -65,6 +66,8 @@ NSString *observerKey = @"feeds";
         
         if ([[[GGRSSFeedsCollection sharedInstance] lastUsedUrl] isEqual:info.url]) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
         }
     }
     
@@ -122,7 +125,7 @@ NSString *observerKey = @"feeds";
 
 - (IBAction)unwindToFeeds:(UIStoryboardSegue *)segue
 {
-
+    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
 }
 
 @end
