@@ -166,22 +166,22 @@ NSString *oKey = @"feeds";
     [self updateTableWithParsedItems];
     [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
     
-//    UIAlertController * alert=   [UIAlertController
-//                                  alertControllerWithTitle:@"My Title"
-//                                  message:@"Enter User Credentials"
+//    UIAlertController * alertController=   [UIAlertController
+//                                  alertControllerWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
+//                                  message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
 //                                  preferredStyle:UIAlertControllerStyleAlert];
 //    
 //    UIAlertAction* cancel = [UIAlertAction
-//                             actionWithTitle:@"Cancel"
+//                             actionWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
 //                             style:UIAlertActionStyleDefault
 //                             handler:^(UIAlertAction * action)
 //                             {
-//                                 [alert dismissViewControllerAnimated:YES completion:nil];
+//                                 [alertController dismissViewControllerAnimated:YES completion:nil];
 //                                 
 //                             }];
-//    [alert addAction:cancel];
+//    [alertController addAction:cancel];
 //    
-//    [self presentViewController:alert animated:YES completion:nil];
+//    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 

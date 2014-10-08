@@ -8,6 +8,9 @@
 
 #import "GGRSSFeedParser.h"
 
+#define GGRSSErrorCodeConnectionFailed 1
+#define GGRSSErrorCodeXmlParsingError 2
+
 @interface GGRSSFeedParser () <NSXMLParserDelegate>
 
 // Feed Downloading Properties
@@ -15,7 +18,6 @@
 @property (nonatomic, strong) NSURLRequest *request;
 @property (nonatomic, strong) NSURLConnection *urlConnection;
 @property (nonatomic, strong) NSMutableData *asyncData;
-@property (nonatomic, strong) NSString *asyncTextEncodingName;
 
 // Parsing Properties
 @property NSXMLParser *xmlParser;
@@ -42,7 +44,6 @@
         NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:self.url
                                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
                                                             timeoutInterval:60];
-        [req setValue:@"GGRSSFeedParser" forHTTPHeaderField:@"User-Agent"];
         self.request = req;
         
     }
@@ -64,9 +65,8 @@
 // Exclude parse state variables as they are needed after parse
 - (void)reset {
     self.asyncData = nil;
-    self.asyncTextEncodingName = nil;
     self.urlConnection = nil;
-    self.foundCharacters = [[NSMutableString alloc] init];
+    self.foundCharacters = nil;
     self.currentFeedItemInfo = nil;
     self.feedInfo = nil;
     self.isItem = NO;
@@ -78,121 +78,51 @@
     // Reset
     [self reset];
     
-//    if (self.xmlParser) // xmlParser is an NSXMLParser instance variable
-//        self.xmlParser = nil;
-//    self.xmlParser = [[NSXMLParser alloc] initWithContentsOfURL:self.url];
-//    [self.xmlParser setDelegate:self];
-//    [self.xmlParser setShouldResolveExternalEntities:NO];
-//    
-//    self.feedInfo = [GGRSSFeedInfo new];
-//    self.feedInfo.url = self.url;
-//    
-//    return [self.xmlParser parse]; // return value not used
-//                                   // if not successful, delegate is informed of error
-    
     // Async
+    self.asyncData = [[NSMutableData alloc] init];  // Create data
     self.urlConnection = [[NSURLConnection alloc] initWithRequest:self.request delegate:self];
     if (self.urlConnection) {
-        self.asyncData = [[NSMutableData alloc] init];// Create data
+        return YES;
     } else {
-//        [self parsingFailedWithErrorCode:MWErrorCodeConnectionFailed
-//                          andDescription:[NSString stringWithFormat:@"Asynchronous connection failed to URL: %@", url]];
+        [self parsingFailedWithErrorCode:GGRSSErrorCodeConnectionFailed
+                          andDescription:[NSString stringWithFormat:@"Asynchronous connection failed to URL: %@", self.url]];
+        self.asyncData = nil;
         return NO;
     }
-    
-    return YES;
 }
 
 // Begin XML parsing
-- (void)startParsingData:(NSData *)data textEncodingName:(NSString *)textEncodingName {
-        
-        // Create feed info
-        GGRSSFeedInfo *feedInfo = [[GGRSSFeedInfo alloc] init];
-        feedInfo.url = self.url;
-        self.feedInfo = feedInfo;
-        
-//        // Check whether it's UTF-8
-//        if (![[textEncodingName lowercaseString] isEqualToString:@"utf-8"]) {
-//            
-//            // Not UTF-8 so convert
-//            NSString *string = nil;
-//            
-//            // Attempt to detect encoding from response header
-//            NSStringEncoding nsEncoding = 0;
-//            if (textEncodingName) {
-//                CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)textEncodingName);
-//                if (cfEncoding != kCFStringEncodingInvalidId) {
-//                    nsEncoding = CFStringConvertEncodingToNSStringEncoding(cfEncoding);
-//                    if (nsEncoding != 0) string = [[NSString alloc] initWithData:data encoding:nsEncoding];
-//                }
-//            }
-//            
-//            // If that failed then make our own attempts
-//            if (!string) {
-//                // http://www.mikeash.com/pyblog/friday-qa-2010-02-19-character-encodings.html
-//                string			    = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-//                if (!string) string = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
-//                if (!string) string = [[NSString alloc] initWithData:data encoding:NSMacOSRomanStringEncoding];
-//            }
-//            
-//            // Nil data
-//            data = nil;
-//            
-//            // Parse
-//            if (string) {
-//                
-//                // Set XML encoding to UTF-8
-//                if ([string hasPrefix:@"<?xml"]) {
-//                    NSRange a = [string rangeOfString:@"?>"];
-//                    if (a.location != NSNotFound) {
-//                        NSString *xmlDec = [string substringToIndex:a.location];
-//                        if ([xmlDec rangeOfString:@"encoding=\"UTF-8\""
-//                                          options:NSCaseInsensitiveSearch].location == NSNotFound) {
-//                            NSRange b = [xmlDec rangeOfString:@"encoding=\""];
-//                            if (b.location != NSNotFound) {
-//                                NSUInteger s = b.location+b.length;
-//                                NSRange c = [xmlDec rangeOfString:@"\"" options:0 range:NSMakeRange(s, [xmlDec length] - s)];
-//                                if (c.location != NSNotFound) {
-//                                    NSString *temp = [string stringByReplacingCharactersInRange:NSMakeRange(b.location,c.location+c.length-b.location)
-//                                                                                     withString:@"encoding=\"UTF-8\""];
-//                                    string = temp;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                
-//                // Convert string to UTF-8 data
-//                if (string) {
-//                    data = [string dataUsingEncoding:NSUTF8StringEncoding];
-//                }
-//                
-//            }
-//        
-        // Create NSXMLParser
+- (void)startParsingData:(NSData *)data {
+    
         if (data) {
+            
+            // Create feed info
+            GGRSSFeedInfo *feedInfo = [[GGRSSFeedInfo alloc] init];
+            self.foundCharacters = [[NSMutableString alloc] init];
+            feedInfo.url = self.url;
+            self.feedInfo = feedInfo;
+            
+            // Create NSXMLParser
             NSXMLParser *newXmlParser = [[NSXMLParser alloc] initWithData:data];
             self.xmlParser = newXmlParser;
             if (self.xmlParser) {
                 
                 // Parse!
                 self.xmlParser.delegate = self;
-//                [self.xmlParser setShouldProcessNamespaces:YES];
                 [self.xmlParser parse];
                 self.xmlParser = nil; // Release after parse
                 
             } else {
-//                [self parsingFailedWithErrorCode:MWErrorCodeFeedParsingError andDescription:@"Feed not a valid XML document"];
+                [self parsingFailedWithErrorCode:GGRSSErrorCodeXmlParsingError andDescription:@"Feed not a valid XML document"];
             }
         } else {
-//            [self parsingFailedWithErrorCode:MWErrorCodeFeedParsingError andDescription:@"Error with feed encoding"];
+            [self parsingFailedWithErrorCode:GGRSSErrorCodeXmlParsingError andDescription:@"Error with feed encoding"];
         }
 }
 
 // Stop parsing
 - (void)stopParsing {
     [self.xmlParser abortParsing];
-    [self parsingFinished];
 }
 
 // Finished parsing document successfully
@@ -202,6 +132,27 @@
     
     // Reset
     [self reset];
+}
+
+// If an error occurs, create NSError and inform delegate
+- (void)parsingFailedWithErrorCode:(int)code andDescription:(NSString *)description {
+        // Create error
+    NSError *error = [NSError errorWithDomain:@"GGRSSFeedParser"
+                              code:code
+                              userInfo:[NSDictionary dictionaryWithObject:description
+                              forKey:NSLocalizedDescriptionKey]];
+        
+    // Abort parsing
+    if (self.xmlParser) {
+        [self.xmlParser abortParsing];
+    }
+    
+    // Reset
+    [self reset];
+    
+    // Inform delegate
+    if ([self.delegate respondsToSelector:@selector(feedParser:didFailWithError:)])
+        [self.delegate feedParser:self didFailWithError:error];
 }
 
 #pragma mark - NSXMLParserDelegate
@@ -232,8 +183,6 @@
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
 {
-    //        NSLog(@"didEndElement: %@ namespaceURI: %@ qualifiedName: %@", elementName, namespaceURI, qName);
-    
     if ([elementName isEqualToString:@"title"]) {
         self.isItem ? (self.currentFeedItemInfo.title = self.foundCharacters) : (self.feedInfo.title = self.foundCharacters);
     }
@@ -277,14 +226,13 @@
 
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
 {
-    NSLog(@"parseErrorOccurred: %@", parseError);
+    [self parsingFailedWithErrorCode:GGRSSErrorCodeXmlParsingError andDescription:[parseError localizedDescription]];
 }
 
 #pragma mark - NSURLConnection Delegate (Async)
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     [self.asyncData setLength:0];
-    self.asyncTextEncodingName = [response textEncodingName];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
@@ -292,28 +240,17 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    
-    // Failed
-    self.urlConnection = nil;
-    self.asyncData = nil;
-    self.asyncTextEncodingName = nil;
-    
-    // Error
-//    [self parsingFailedWithErrorCode:MWErrorCodeConnectionFailed andDescription:[error localizedDescription]];
+    [self reset];
+    [self parsingFailedWithErrorCode:GGRSSErrorCodeConnectionFailed andDescription:[error localizedDescription]];
     
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    // Parse
-//    if (!stopped) [self startParsingData:self.asyncData textEncodingName:self.asyncTextEncodingName];
-    [self startParsingData:self.asyncData textEncodingName:self.asyncTextEncodingName];
-    
-    // Cleanup
-    self.urlConnection = nil;
-    self.asyncData = nil;
-    self.asyncTextEncodingName = nil;
-    
+    [self startParsingData:self.asyncData];
+    [self reset];
 }
+
+
 
 -(NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
     return nil; // Don't cache
@@ -343,7 +280,6 @@
         
         // Finish
         self.self.currentFeedItemInfo = nil;
-        
     }
 }
 
