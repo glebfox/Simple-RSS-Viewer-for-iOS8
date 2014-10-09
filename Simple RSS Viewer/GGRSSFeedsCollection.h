@@ -13,8 +13,8 @@
 
 + (id)sharedInstance;
 
-- (NSURL *)lastUsedUrl;
-- (void)setLastUsedUrl:(NSURL *)url;
+@property (nonatomic, strong) NSURL *lastUsedUrl;
+
 - (void)addFeedWithTitle:(NSString *)title url:(NSString *)urlString;
 - (NSArray *)allFeeds;
 - (void)deleteFeedWithTitle:(NSString *)title;

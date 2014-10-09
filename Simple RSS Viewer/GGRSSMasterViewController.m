@@ -245,6 +245,7 @@ NSString *oKey = @"feeds";
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if ([keyPath isEqualToString:oKey]) {
+        // Если вдруг удалили из списка активный фид, то очищаем таблицу и заносим пустую ссылку в ресурсы
         if ([self lastUsedFeedDeleted]) {
             [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
             self.itemsToDisplay = nil;

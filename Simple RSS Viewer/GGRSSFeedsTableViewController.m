@@ -23,12 +23,14 @@ NSString *observerKey = @"feeds";
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+    // Если форма не отображается, то ей и не обязательно знать об изменениях в списке фидов
     [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:observerKey];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    // Подписываемся на изменения в списке фидов
     [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
 }
 
@@ -86,8 +88,6 @@ NSString *observerKey = @"feeds";
         // Удаляем выбранную строку с формы и из ресурсов
         GGRSSFeedInfo *info = self.feedsToDisplay[indexPath.row];
         [[GGRSSFeedsCollection sharedInstance] deleteFeedWithTitle:info.title];
-//        self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
-//        [tableView reloadData];
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
     }   
@@ -95,6 +95,7 @@ NSString *observerKey = @"feeds";
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
+    // Если список фидов был изменен, то обновляем таблицу
     if ([keyPath isEqualToString:observerKey]) {
         self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
         [self.tableView reloadData];
