@@ -57,11 +57,11 @@ NSString *observerKey = @"feeds";
         GGRSSFeedInfo *info = self.feedsToDisplay[indexPath.row];
         
         // Заголовок будет хранить название фида
-        cell.textLabel.font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_TitleSize"]];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"FeedsTableView_TitleSize"]];
         cell.textLabel.text = info.title;
     
         // Подзаголовок будет хранить адрес фида
-        cell.detailTextLabel.font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_SubtitleSize"]];
+        cell.detailTextLabel.font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"FeedsTableView_SubtitleSize"]];
         cell.detailTextLabel.text = [info.url absoluteString];
         
         if ([[[GGRSSFeedsCollection sharedInstance] lastUsedUrl] isEqual:info.url]) {

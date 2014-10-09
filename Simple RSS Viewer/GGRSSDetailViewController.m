@@ -109,7 +109,9 @@
             
             NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
             paragraphStyle.lineSpacing = [[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"DetailView_SummaryLineSpacing"];
-            NSDictionary *attributes = [NSDictionary dictionaryWithObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
+            UIFont *font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"DetailView_SummarySize"]];
+//            NSDictionary *attributes = [NSDictionary dictionaryWithObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
+            NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:paragraphStyle, NSParagraphStyleAttributeName, font, NSFontAttributeName, nil];
             
             NSMutableAttributedString *summaryString = [[NSMutableAttributedString alloc] initWithString:[[self.detailItem.summary stringByConvertingHTMLToPlainText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] ] attributes:attributes];
             

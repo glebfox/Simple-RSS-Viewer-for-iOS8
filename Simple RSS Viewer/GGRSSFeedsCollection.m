@@ -12,7 +12,9 @@
     NSURL *_lastUsedUrl;
 }
 
-@property(nonatomic, strong) NSMutableDictionary *feeds;
+@property (nonatomic, strong) NSMutableDictionary *feeds;
+@property (nonatomic, strong) NSString *feedsPath;
+@property (nonatomic, strong) NSString *urlPath;
 
 @end
 
@@ -34,16 +36,43 @@
     self = [super init];
     
     if (self) {
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsUrl" ofType:@"plist"];
-        self.feeds = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+//        NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsUrl" ofType:@"plist"];
+//        self.feeds = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+        
+        
+        NSError *error;
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        self.feedsPath = [documentsDirectory stringByAppendingPathComponent:@"FeedsUrl.plist"];
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        if (![fileManager fileExistsAtPath: self.feedsPath])
+        {
+            NSString *bundle = [[NSBundle mainBundle] pathForResource:@"FeedsUrl" ofType:@"plist"];
+            [fileManager copyItemAtPath:bundle toPath: self.feedsPath error:&error];
+        }
+        self.feeds = [NSMutableDictionary dictionaryWithContentsOfFile:self.feedsPath];
+        if (error) {
+            NSLog(@"%@", error);
+        }
+        
+        error = nil;
+        self.urlPath = [documentsDirectory stringByAppendingPathComponent:@"FeedsLastUrl.plist"];
+        if (![fileManager fileExistsAtPath:self.urlPath]) {
+            NSString *bundle = [[NSBundle mainBundle] pathForResource:@"FeedsLastUrl" ofType:@"plist"];
+            [fileManager copyItemAtPath:bundle toPath: self.urlPath error:&error];
+        }
+        if (error) {
+            NSLog(@"%@", error);
+        }
     }
     return self;
 }
 
 - (NSURL *) lastUsedUrl
 {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsLastUrl" ofType:@"plist"];
-    NSArray *url = [NSArray arrayWithContentsOfFile:path];
+    NSArray *url = [NSArray arrayWithContentsOfFile:self.urlPath];
     NSString *urlStrind = url[0];
     _lastUsedUrl = urlStrind.length > 0 ? [NSURL URLWithString:url[0]] : nil;
     
@@ -62,11 +91,10 @@
         _lastUsedUrl = url;
         
         NSError *error;
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsLastUrl" ofType:@"plist"];
         NSData *xmlData = [NSPropertyListSerialization dataWithPropertyList:@[urlString] format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
         
         if(xmlData) {
-            [xmlData writeToFile:path atomically:YES];
+            [xmlData writeToFile:self.urlPath atomically:YES];
         }
         else {
             NSLog(@"%@", error);
@@ -120,12 +148,10 @@
 - (void)saveFeeds
 {
     NSError *error;
-    
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"FeedsUrl" ofType:@"plist"];
     NSData *xmlData = [NSPropertyListSerialization dataWithPropertyList:self.feeds format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
     
     if(xmlData) {
-        [xmlData writeToFile:path atomically:YES];
+        [xmlData writeToFile:self.feedsPath atomically:YES];
     }
     else {
         NSLog(@"%@", error);

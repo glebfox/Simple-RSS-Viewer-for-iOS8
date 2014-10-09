@@ -210,7 +210,7 @@ NSString *oKey = @"feeds";
         if (item) {
             // Заголовок строки = заголовок новости. Полужирное начертание
             NSString *itemTitle = item.title ? [item.title stringByConvertingHTMLToPlainText]:NSLocalizedString (@"MasterView_FeedNoTitle", nil);
-            UIFont *font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_TitleSize"]];
+            UIFont *font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"MasterTableView_TitleSize"]];
         
             NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
         
@@ -218,13 +218,12 @@ NSString *oKey = @"feeds";
         
             // Оставшееся место в заголовке строки заполняем описанием новости. Обычное написание, шрифт поменьше.
             if (item.summary) {
-                font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"TableView_SubtitleSize"]];
+                font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"MasterTableView_SummarySize"]];
                 attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
                 NSMutableAttributedString *summary = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@", [[item.summary stringByConvertingHTMLToPlainText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]] attributes:attributes];
             
                 [title appendAttributedString:summary];
             }
-        
             cell.textLabel.attributedText = title;
         
             // Подзаголовок строки = дата новости
@@ -234,6 +233,7 @@ NSString *oKey = @"feeds";
                 [self.formatter setDateStyle:NSDateFormatterShortStyle];
                 [self.formatter setTimeStyle:NSDateFormatterShortStyle];
             
+                cell.detailTextLabel.font = font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"MasterTableView_SubtitleSize"]];
                 cell.detailTextLabel.text = [NSString stringWithFormat:@"%@", [self.formatter stringFromDate:item.date]];
             }
         }

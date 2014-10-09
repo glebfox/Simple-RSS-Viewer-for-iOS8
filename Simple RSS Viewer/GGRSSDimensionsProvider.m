@@ -11,7 +11,7 @@
 
 @interface GGRSSDimensionsProvider ()
 
-@property(nonatomic, strong) NSDictionary *dimensions;
+@property (nonatomic, strong) NSDictionary *dimensions;
 
 @end
 
@@ -35,7 +35,6 @@
     if (self) {
         NSString *path = [[NSBundle mainBundle] pathForResource:@"Dimensions" ofType:@"plist"];
         self.dimensions = [NSDictionary dictionaryWithContentsOfFile:path];
-        
     }
     return self;
 }
