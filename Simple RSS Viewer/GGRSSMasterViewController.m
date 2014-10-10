@@ -12,12 +12,12 @@
 #import "GGRSSDimensionsProvider.h"
 #import "GGRSSFeedsTableViewController.h"
 #import "GGRSSFeedUrlSource.h"
-#import "GGRSSFeedParser.h"
+//#import "GGRSSFeedParser.h"
 #import "NSString+HTML.h"
 
 NSString *oKey = @"feeds";
 
-@interface GGRSSMasterViewController () <GGRSSFeedParserDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface GGRSSMasterViewController () <UITableViewDelegate, UITableViewDataSource>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
@@ -53,10 +53,7 @@ NSString *oKey = @"feeds";
     [self.refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:self.refreshControl];
     
-    // Получаем последний загруженный адрес на фид
-    NSURL *feedURL = [[GGRSSFeedsCollection sharedInstance] lastUsedUrl];
     [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:oKey options:NSKeyValueObservingOptionNew context:nil];
-    [self setParserWithUrl:feedURL];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -67,7 +64,7 @@ NSString *oKey = @"feeds";
 #pragma mark - Parsing
 
 // Создает новый парсер с указанным url
-- (void)setParserWithUrl:(NSURL *)url
+- (void)setParserWithUrl:(NSURL *)url delegate:(id<GGRSSFeedParserDelegate>)delegate
 {
     if (url != nil) {
         // Обновляем заголовок формы, запускаем анимацию и скрываем таблицу, чтобы было видно анимацию
@@ -82,7 +79,7 @@ NSString *oKey = @"feeds";
         }
         
         self.feedParser = [[GGRSSFeedParser alloc] initWithFeedURL:url];
-        self.feedParser.delegate = self;
+        self.feedParser.delegate = delegate;
         self.parsedItems = nil;
         self.parsedItems = [NSMutableArray new];
         self.isNewFeedParsing = YES;
@@ -308,7 +305,7 @@ NSString *oKey = @"feeds";
         NSURL *newUrl = sourse.url;
         // Поэтому, если url не пустой и не равен уже загруженному фиду, то запускаем новый парсинг
         if (newUrl != nil && ![self.feedParser.url isEqual:newUrl]) {
-            [self setParserWithUrl:newUrl];
+            [self setParserWithUrl:newUrl delegate:self];
         }
     }
 }

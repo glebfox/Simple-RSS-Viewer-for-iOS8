@@ -19,23 +19,20 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-//    NSLog(@"didFinishLaunchingWithOptions");
-//    NSLog(@"state: %ld", application.applicationState);
     
-//    // Получаем последний загруженный адрес на фид
-//    NSURL *feedURL = [[GGRSSFeedsCollection sharedInstance] lastUsedUrl];
-//    
-//    UIStoryboard *mainstoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UIViewController *root = mainstoryboard.instantiateInitialViewController;
-//    
-//    if ([root class] == [UINavigationController class]) {
-//        UINavigationController *navController = (UINavigationController *)root;
-//        UIViewController *controller = navController.topViewController;
-//        if ([controller class] == [GGRSSMasterViewController class]) {
-//            GGRSSMasterViewController *master = (GGRSSMasterViewController *)controller;
-//            [master setParserWithUrl:feedURL];
-//        }
-//    }
+    // Получаем последний загруженный адрес на фид
+    NSURL *feedURL = [[GGRSSFeedsCollection sharedInstance] lastUsedUrl];
+
+    UIViewController *root = self.window.rootViewController;
+    
+    if ([root class] == [UINavigationController class]) {
+        UINavigationController *navController = (UINavigationController *)root;
+        UIViewController *controller = navController.topViewController;
+        if ([controller class] == [GGRSSMasterViewController class]) {
+            GGRSSMasterViewController *master = (GGRSSMasterViewController *)controller;
+            [master setParserWithUrl:feedURL delegate:master];
+        }
+    }
     
     return YES;
 }

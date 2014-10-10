@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "GGRSSFeedParser.h"
 
-@interface GGRSSMasterViewController : UIViewController
+@interface GGRSSMasterViewController : UIViewController <GGRSSFeedParserDelegate>
+
+- (void)setParserWithUrl:(NSURL *)url delegate:(id<GGRSSFeedParserDelegate>)delegate;
 
 @end
