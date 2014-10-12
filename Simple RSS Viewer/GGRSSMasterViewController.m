@@ -12,7 +12,6 @@
 #import "GGRSSDimensionsProvider.h"
 #import "GGRSSFeedsTableViewController.h"
 #import "GGRSSFeedUrlSource.h"
-//#import "GGRSSFeedParser.h"
 #import "NSString+HTML.h"
 
 NSString *oKey = @"feeds";
@@ -59,6 +58,12 @@ NSString *oKey = @"feeds";
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+//    NSLog(@"GGRSSMasterController - dealloc");
+    [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:oKey];
 }
 
 #pragma mark - Parsing

@@ -21,12 +21,6 @@ NSString *observerKey = @"feeds";
 
 @synthesize url;
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    // Если форма не отображается, то ей и не обязательно знать об изменениях в списке фидов
-    [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:observerKey];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -37,6 +31,14 @@ NSString *observerKey = @"feeds";
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+//    NSLog(@"GGRSSFeedsTableViewController - dealloc");
+    [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:observerKey];
+    
+    
 }
 
 #pragma mark - Table view data source
@@ -126,7 +128,7 @@ NSString *observerKey = @"feeds";
 
 - (IBAction)unwindToFeeds:(UIStoryboardSegue *)segue
 {
-    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
+    
 }
 
 @end
