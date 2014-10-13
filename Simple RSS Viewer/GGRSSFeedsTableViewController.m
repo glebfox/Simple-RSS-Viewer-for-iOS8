@@ -35,7 +35,7 @@ NSString *observerKey = @"feeds";
 
 - (void)dealloc
 {
-//    NSLog(@"GGRSSFeedsTableViewController - dealloc");
+    NSLog(@"GGRSSFeedsTableViewController - dealloc");
     [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:observerKey];
     
     

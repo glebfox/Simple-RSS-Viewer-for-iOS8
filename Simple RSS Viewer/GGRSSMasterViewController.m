@@ -28,7 +28,7 @@ NSString *oKey = @"feeds";
 
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 
-@property (nonatomic) BOOL isNewFeedParsing;
+@property (nonatomic, getter=isNewFeedParsing) BOOL newFeedParsing;
 
 @end
 
@@ -87,7 +87,7 @@ NSString *oKey = @"feeds";
         self.feedParser.delegate = delegate;
         self.parsedItems = nil;
         self.parsedItems = [NSMutableArray new];
-        self.isNewFeedParsing = YES;
+        self.newFeedParsing = YES;
         [self.feedParser parse];
     } else {
         
@@ -101,7 +101,7 @@ NSString *oKey = @"feeds";
         self.title = NSLocalizedString (@"MasterViewTitle_Refreshing", nil);
         [self.parsedItems removeAllObjects];
         [self.feedParser stopParsing];
-        self.isNewFeedParsing = NO;
+        self.newFeedParsing = NO;
         [self.feedParser parse];
     } else {
         [self.refreshControl endRefreshing];
@@ -134,7 +134,7 @@ NSString *oKey = @"feeds";
 //    NSLog(@"Parsed Feed Info: “%@”", info.title);
     if (self.isNewFeedParsing) {
         [[GGRSSFeedsCollection sharedInstance] addFeedWithTitle:info.title url:[info.url absoluteString]];
-        self.isNewFeedParsing = NO;
+        self.newFeedParsing = NO;
     }
     self.title = info.title;
 }
