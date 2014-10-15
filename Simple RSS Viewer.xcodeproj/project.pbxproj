@@ -136,6 +136,7 @@
 		7E5B891119D86B8D006FBC8C /* Simple RSS Viewer */ = {
 			isa = PBXGroup;
 			children = (
+				7EC143AE19EEAD6A00374DEA /* Resources */,
 				7E5B893A19D86F5C006FBC8C /* App */,
 				7E5B894119D8720B006FBC8C /* Model */,
 				7E5B893C19D86F72006FBC8C /* Views */,
@@ -200,7 +201,6 @@
 			isa = PBXGroup;
 			children = (
 				7E5B891C19D86B8E006FBC8C /* Main.storyboard */,
-				7E5B891F19D86B8E006FBC8C /* Images.xcassets */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -257,6 +257,14 @@
 				7E5B897019D87571006FBC8C /* GTMNSString+HTML.m */,
 			);
 			name = "Google Toolbox for Mac";
+			sourceTree = "<group>";
+		};
+		7EC143AE19EEAD6A00374DEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7E5B891F19D86B8E006FBC8C /* Images.xcassets */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
