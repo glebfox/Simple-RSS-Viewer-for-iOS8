@@ -9,6 +9,7 @@
 #import "GGRSSFeedParser.h"
 #import "NSDate+InternetDateTime.h"
 #import "AppDelegate.h"
+#import "Reachability.h"
 
 NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.SimpleRSSViewer.BackgroundSession";
 
@@ -102,7 +103,7 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 - (BOOL)parse {
     
     if (!self.url || !self.delegate) {
-        [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_NOT_INITIATED andDescription:NSLocalizedString(@"Delegate or URL not specified", nil)];
+        [self parsingFailedWithErrorCode:GGRSSFeedParserNotInituatedErrorCode andDescription:NSLocalizedString(@"Delegate or URL not specified", nil)];
         return NO;
     }
     
@@ -120,6 +121,18 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 //                        [self reset];
 //                    }
 //                }] resume];
+    
+    // Проверяем доступность хоста
+    Reachability* reachability = [Reachability reachabilityWithHostName: [self.url host]];
+    NetworkStatus netStatus = [reachability currentReachabilityStatus];
+    // хост может быть недоступен по двум причинам: 1. Не правильный адрес 2. Нет подулючения к сети
+    // т.к. NSURLSession backhroundTask все равно запустит ожидание подключения, чтобы загрузить все позже,
+    // в случае отсутствия сети так же останавливаем работу парсера, чтобы не сбивать пользователя с толку
+    // бесконечным спинером
+    if (netStatus == NotReachable) {
+        [self parsingFailedWithErrorCode:GGRSSFeedParserConnectionFailedErrorCode andDescription:NSLocalizedString(@"Сouldn't connect to host", nil)];
+        return NO;
+    }
     
     self.downloadTask = [self.session downloadTaskWithRequest:self.request];
     [self.downloadTask resume];
@@ -149,10 +162,10 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
             self.xmlParser = nil;
             
         } else {
-            [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_XML_PARSING_ERROR andDescription:NSLocalizedString(@"Feed not a valid XML document", nil)];
+            [self parsingFailedWithErrorCode:GGRSSFeedParserXMLParsingFailedErrorCode andDescription:NSLocalizedString(@"Feed not a valid XML document", nil)];
         }
     } else {
-        [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_XML_PARSING_ERROR andDescription:NSLocalizedString(@"Error with feed encoding", nil)];
+        [self parsingFailedWithErrorCode:GGRSSFeedParserXMLParsingFailedErrorCode andDescription:NSLocalizedString(@"Error with feed encoding", nil)];
     }
 }
 
@@ -226,7 +239,7 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
     if (error && error.code != -999) { // -999 = cancelled
-        [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_CONNECTION_FAILED
+        [self parsingFailedWithErrorCode:GGRSSFeedParserConnectionFailedErrorCode
                           andDescription:[NSString stringWithFormat:NSLocalizedString(@"Asynchronous connection failed to URL: %@", nil), self.url]];
     }
 }
@@ -318,7 +331,7 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
 {
-    [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_XML_PARSING_ERROR andDescription:[parseError localizedDescription]];
+    [self parsingFailedWithErrorCode:GGRSSFeedParserXMLParsingFailedErrorCode andDescription:[parseError localizedDescription]];
 }
 
 #pragma mark - Send Items to Delegate

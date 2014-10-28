@@ -13,9 +13,9 @@
 // Коды ошибок
 enum
 {
-    GGRSS_ERROR_CODE_NOT_INITIATED,
-    GGRSS_ERROR_CODE_CONNECTION_FAILED,
-    GGRSS_ERROR_CODE_XML_PARSING_ERROR
+    GGRSSFeedParserNotInituatedErrorCode,
+    GGRSSFeedParserConnectionFailedErrorCode,
+    GGRSSFeedParserXMLParsingFailedErrorCode,
 };
 
 @class GGRSSFeedParser;

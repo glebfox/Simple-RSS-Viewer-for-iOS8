@@ -26,6 +26,7 @@
 		7E5B896D19D8734A006FBC8C /* NSDate+InternetDateTime.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B896B19D8734A006FBC8C /* NSDate+InternetDateTime.m */; };
 		7E5B897119D87571006FBC8C /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B897019D87571006FBC8C /* GTMNSString+HTML.m */; };
 		7E5B897419D88696006FBC8C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E5B897619D88696006FBC8C /* Localizable.strings */; };
+		7E635B9819FFD19A009813E8 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E635B9719FFD19A009813E8 /* Reachability.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +77,8 @@
 		7E5B897019D87571006FBC8C /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		7E5B897719D88697006FBC8C /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E5B897819D886AC006FBC8C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7E635B9619FFD19A009813E8 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		7E635B9719FFD19A009813E8 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		7EF32FBA19E523050008ECB9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -131,6 +134,7 @@
 		7E5B891119D86B8D006FBC8C /* Simple RSS Viewer */ = {
 			isa = PBXGroup;
 			children = (
+				7E635B9519FFD18D009813E8 /* API */,
 				7EC143AE19EEAD6A00374DEA /* Resources */,
 				7E5B893A19D86F5C006FBC8C /* App */,
 				7E5B894119D8720B006FBC8C /* Model */,
@@ -249,6 +253,15 @@
 				7E5B897019D87571006FBC8C /* GTMNSString+HTML.m */,
 			);
 			name = "Google Toolbox for Mac";
+			sourceTree = "<group>";
+		};
+		7E635B9519FFD18D009813E8 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				7E635B9619FFD19A009813E8 /* Reachability.h */,
+				7E635B9719FFD19A009813E8 /* Reachability.m */,
+			);
+			name = API;
 			sourceTree = "<group>";
 		};
 		7EC143AE19EEAD6A00374DEA /* Resources */ = {
@@ -372,6 +385,7 @@
 				7E5B891519D86B8E006FBC8C /* main.m in Sources */,
 				7E5B894C19D87228006FBC8C /* GGRSSMasterViewController.m in Sources */,
 				7E48B74819E185450019C661 /* GGRSSFeedParser.m in Sources */,
+				7E635B9819FFD19A009813E8 /* Reachability.m in Sources */,
 				7E5B896C19D8734A006FBC8C /* NSString+HTML.m in Sources */,
 				7E5B896D19D8734A006FBC8C /* NSDate+InternetDateTime.m in Sources */,
 				7E5B897119D87571006FBC8C /* GTMNSString+HTML.m in Sources */,

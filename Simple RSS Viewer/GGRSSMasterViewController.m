@@ -235,7 +235,7 @@
     [self feedParserDidFinish:parser];    
     [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
     
-    if (error.code != GGRSS_ERROR_CODE_CONNECTION_FAILED) {
+    if (error.code != GGRSSFeedParserConnectionFailedErrorCode) {
         [self.refreshControl removeFromSuperview];
     }
 }
