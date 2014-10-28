@@ -106,7 +106,7 @@
         // Обновляем заголовок формы, запускаем анимацию и скрываем таблицу, чтобы было видно анимацию
         self.title = NSLocalizedString (@"MasterViewTitle_Loading", nil);
         [self prepareUIforParsing];
-    
+
         // Если не первый запуск, то останавливаем прерыдущий парсинг и обнуляем парсер
         if (self.feedParser != nil) {
             [self.feedParser stopParsing];
@@ -189,6 +189,7 @@
 - (void)feedParser:(GGRSSFeedParser *)parser didFailWithError:(NSError *)error
 {
     // В случае ошибки формируем предупреждение для пользователя
+    // Если UIAlertController существует, значит версия >= iOS8
     if ([UIAlertController class]) {
         NSLog(@"UIAlertController");
         UIAlertController * alertController=   [UIAlertController
@@ -206,7 +207,7 @@
                                  }];
         [alertController addAction:cancel];
         [self presentViewController:alertController animated:YES completion:nil];
-    } else {
+    } else {    // Иначе версия < iOS8
         NSLog(@"UIAlertView");
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
                                                         message: [error localizedDescription]
@@ -223,9 +224,6 @@
     self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
     [self feedParserDidFinish:parser];    
     [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
-//    if (error.code != GGRSS_ERROR_CODE_CONNECTION_FAILED) {
-//        self.feedParser = nil;
-//    }
 }
 
 

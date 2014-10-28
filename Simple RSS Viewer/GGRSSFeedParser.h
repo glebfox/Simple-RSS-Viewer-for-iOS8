@@ -42,3 +42,5 @@ enum
 //- (NSURL *)url;
 
 @end
+
+NSString *const GGRSSFeedParserBackgroundSessionIdentifier;

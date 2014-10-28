@@ -10,6 +10,8 @@
 #import "NSDate+InternetDateTime.h"
 #import "AppDelegate.h"
 
+NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.SimpleRSSViewer.BackgroundSession";
+
 @interface GGRSSFeedParser () <NSXMLParserDelegate, NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate>
 
 // Свойства для скачивания инфы
@@ -55,12 +57,6 @@
             feedURL = [NSURL URLWithString:(NSString *)feedURL];
         }
         self.url = feedURL;
-
-        // Создаем request
-//        NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:self.url
-//                                                                cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-//                                                            timeoutInterval:60];
-//        self.request = req;
         
     }
     return self;
@@ -68,7 +64,6 @@
 
 - (id)initWithFeedRequest:(NSMutableURLRequest *)feedRequest {
     if (self = [self init]) {
-//        self.url = feedRequest.URL;
         self.request = feedRequest;
     }
     return self;
@@ -84,7 +79,13 @@
     static NSURLSession *session = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration backgroundSessionConfiguration:@"com.gorelov.SimpleRSSViewer.BackgroundSession"];
+        
+        NSURLSessionConfiguration *configuration = nil;
+        if ([NSURLSessionConfiguration respondsToSelector:@selector(backgroundSessionConfigurationWithIdentifier:)]) {
+            configuration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:GGRSSFeedParserBackgroundSessionIdentifier];
+        } else {
+            configuration = [NSURLSessionConfiguration backgroundSessionConfiguration:GGRSSFeedParserBackgroundSessionIdentifier];
+        }
         session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
     });
     
@@ -110,6 +111,18 @@
     
     self.downloadTask = [self.session downloadTaskWithRequest:self.request];
     [self.downloadTask resume];
+//    NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration ] delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
+//    [[session dataTaskWithRequest: self.request
+//                completionHandler:^(NSData *data, NSURLResponse *response,
+//                                    NSError *error) {
+//                    if (error) {
+//                        [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_CONNECTION_FAILED
+//                                          andDescription:[NSString stringWithFormat:NSLocalizedString(@"Asynchronous connection failed to URL: %@", nil), self.url]];
+//                    } else {
+//                        [self startParsingData:data];
+//                        [self reset];
+//                    }
+//                }] resume];
     
     return YES;
 }
@@ -187,9 +200,6 @@
     {
         double progress = (double)totalBytesWritten / (double)totalBytesExpectedToWrite;
         NSLog(@"progress: %lf", progress);
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            self.progressView.progress = progress;
-//        });
     }
 }
 
@@ -200,35 +210,13 @@
      The download completed, you need to copy the file at targetPath before the end of this block.
      As an example, copy the file to the Documents directory of your app.
      */
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    
-//    NSArray *URLs = [fileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-//    NSURL *documentsDirectory = [URLs objectAtIndex:0];
-//    
-//    NSURL *originalURL = [[downloadTask originalRequest] URL];
-//    NSURL *destinationURL = [documentsDirectory URLByAppendingPathComponent:[originalURL lastPathComponent]];
-//    NSError *errorCopy;
-//    
-//    // For the purposes of testing, remove any esisting file at the destination.
-//    [fileManager removeItemAtURL:destinationURL error:NULL];
-//    BOOL success = [fileManager copyItemAtURL:downloadURL toURL:destinationURL error:&errorCopy];
-//    
-//    if (success)
-//    {
+    // т.к. мне не надо хранить файл для будущего использования, я решил создавать NSData из временного файла, не засоряя систему лишними файлами
     NSData *data = [NSData dataWithContentsOfURL:downloadURL];
         dispatch_async(dispatch_get_main_queue(), ^{
 //            [self startParsingData:[NSData dataWithContentsOfFile:[destinationURL path]]];
             [self startParsingData:data];
             [self reset];
         });
-//    }
-//    else
-//    {
-//        /*
-//         In the general case, what you might do in the event of failure depends on the error and the specifics of your application.
-//         */
-//        NSLog(@"Error during the copy: %@", [errorCopy localizedDescription]);
-//    }
 }
 
 
@@ -267,7 +255,7 @@
 {
     [self.foundCharacters setString:@""];
 
-    // Если бывл начат новый item, то создаем экземпляр GGRSSFeedItemInfo
+    // Если был начат новый item, то создаем экземпляр GGRSSFeedItemInfo
     if ([elementName isEqualToString:@"channel"]) {
         self.isItem = NO;
     } else if ([elementName isEqualToString:@"item"]) {
@@ -351,9 +339,10 @@
 
 #pragma mark - NSURL and NSURLRequest
 
+// Кастомные сетеры, чтобы синхронизировать url и request
 - (void)setUrl:(NSURL *)url {
     _url = url;
-    _request = [NSURLRequest requestWithURL:self.url];
+    _request = [NSURLRequest requestWithURL:self.url]; // cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:60];
 }
 
 - (void)setRequest:(NSURLRequest *)request {
