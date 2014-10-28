@@ -15,7 +15,6 @@
 
 + (id)sharedInstance;
 
-//@property (nonatomic, weak) id <GGRSSFeedsCollectionDelegate> delegate;
 @property (nonatomic, strong) NSURL *lastUsedUrl;
 
 - (void)addFeedWithTitle:(NSString *)title url:(NSString *)urlString;

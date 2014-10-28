@@ -15,8 +15,6 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 @interface GGRSSFeedParser () <NSXMLParserDelegate, NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate>
 
 // Свойства для скачивания инфы
-//@property (nonatomic, copy) NSURL *url;
-//@property (nonatomic, strong) NSURLRequest *request;
 @property (nonatomic, strong) NSData *data;
 
 @property (nonatomic, strong) NSURLSession *session;
