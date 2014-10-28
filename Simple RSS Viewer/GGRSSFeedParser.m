@@ -54,7 +54,8 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
         
         // URL
         if ([feedURL isKindOfClass:[NSString class]]) {
-            feedURL = [NSURL URLWithString:(NSString *)feedURL];
+            NSString *escapedString = [(NSString *)feedURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            feedURL = [NSURL URLWithString:escapedString];
         }
         self.url = feedURL;
         

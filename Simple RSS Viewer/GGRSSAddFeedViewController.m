@@ -45,7 +45,7 @@
         // Если что то было введено в тектовом поле, то...
         if (self.urlText.text.length > 0) {
             NSString *stringURL = self.urlText.text;
-            // ... проверяем адрес на соответсиве полной форме и добавляем в начало недостающую часть
+            // ... проверяем адрес на соответсвие полной форме и добавляем в начало недостающую часть
             if (![stringURL hasPrefix:@"http://"]) {
                 stringURL = [@"http://" stringByAppendingString:stringURL];
             }
