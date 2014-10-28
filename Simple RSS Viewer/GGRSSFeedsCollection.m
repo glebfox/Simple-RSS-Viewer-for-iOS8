@@ -8,11 +8,16 @@
 
 #import "GGRSSFeedsCollection.h"
 
+NSString *const GGRSSFeedsCollectionChangedNotification = @"GGRSSFeedsCollectionChangedNotification";
+
 @interface GGRSSFeedsCollection ()
 
 @property (nonatomic, strong) NSMutableDictionary *feeds;   // Список сохраненных фидов
+@property (nonatomic, strong) NSArray *feedsArray;
 @property (nonatomic, strong) NSString *feedsPath;  // Путь до файла с списком фидов в документах юзера
 @property (nonatomic, strong) NSString *urlPath;    // Путь до файла с списком фидов в документах юзера
+@property (nonatomic, getter=isFeedsChanged) BOOL feedsChanged; // Признак, того что надо заново скомпоновать allFeeds
+@property (nonatomic, strong) NSNotification *notification;
 
 @end
 
@@ -61,6 +66,8 @@
             [fileManager copyItemAtPath:bundle toPath: self.urlPath error:&error];
             if (error) NSLog(@"%@", error);
         }
+        
+        self.notification = [NSNotification notificationWithName:GGRSSFeedsCollectionChangedNotification object:self];
     }
     return self;
 }
@@ -106,49 +113,44 @@
     NSString *value = self.feeds[title];
     // Если нам есть что сохранять и данные уникальные (на уникальность проверяется только адрес)
     if (value == nil || ![value isEqualToString:urlString]) {
-        // Сообщаем о намерении изменить список фидов
-        [self willChangeValueForKey:@"feeds"];
-        // Изменяем
         [self.feeds setObject:urlString forKey:title];
-        // И сохраняем
         [self saveFeeds];
-        // Констатируем факт, что изменили список фидов
-        [self didChangeValueForKey:@"feeds"];
+        
+        self.feedsChanged = true;
+        [[NSNotificationCenter defaultCenter] postNotification:self.notification];
     }
 }
 
 - (void)deleteFeedWithTitle:(NSString *)title
 {
-    // Сообщаем о намерении изменить список фидов
-    [self willChangeValueForKey:@"feeds"];
-    // Удаляем
     [self.feeds removeObjectForKey:title];
-    // Сохраняем изменения
     [self saveFeeds];
-    // Констатируем факт, что изменили список фидов
-    [self didChangeValueForKey:@"feeds"];
     
+    self.feedsChanged = true;
+    [[NSNotificationCenter defaultCenter] postNotification:self.notification];
 }
 
-/* 
+/*
  Формирует из словаря массив GGRSSFeedInfo для удобной обработки контроллерами
  */
 - (NSArray *)allFeeds
 {
+    // нет смысла каждый раз копировать
     NSArray *keys = [self.feeds allKeys];
     if (keys.count > 0) {
-        NSMutableArray *feeds = [NSMutableArray new];
-        
-        for (NSString *key in keys) {
-            GGRSSFeedInfo *info = [GGRSSFeedInfo new];
-            info.title = key;
-            info.url = [NSURL URLWithString:self.feeds[key]];
-            [feeds addObject:info];
+        if (!self.feedsArray || self.isFeedsChanged) {
+            NSMutableArray *feeds = [NSMutableArray new];
+            for (NSString *key in keys) {
+                GGRSSFeedInfo *info = [GGRSSFeedInfo new];
+                info.title = key;
+                info.url = [NSURL URLWithString:self.feeds[key]];
+                [feeds addObject:info];
+            }
+            self.feedsChanged = false;
+            self.feedsArray = [feeds copy];
         }
-        
-        return [feeds copy];
+        return self.feedsArray;
     }
-    
     return nil;
 }
 
@@ -162,16 +164,6 @@
     }
     else {
         NSLog(@"%@", error);
-    }
-}
-
-+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
-{
-    // Для списка фидов отключаем автоматическое оповещение об изменениях
-    if ([key isEqualToString:@"feeds"]) {
-        return NO;
-    } else {
-        return [super automaticallyNotifiesObserversForKey:key];
     }
 }
 

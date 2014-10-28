@@ -20,23 +20,4 @@
     return string;
 }
 
-#pragma mark NSCoding
-
-- (id)initWithCoder:(NSCoder *)decoder {
-    if ((self = [super init])) {
-        self.title = [decoder decodeObjectForKey:@"title"];
-        self.link = [decoder decodeObjectForKey:@"link"];
-        self.summary = [decoder decodeObjectForKey:@"summary"];
-        self.url = [decoder decodeObjectForKey:@"url"];
-    }
-    return self;
-}
-
-- (void)encodeWithCoder:(NSCoder *)encoder {
-    if (self.title) [encoder encodeObject:self.title forKey:@"title"];
-    if (self.link) [encoder encodeObject:self.link forKey:@"link"];
-    if (self.summary) [encoder encodeObject:self.summary forKey:@"summary"];
-    if (self.url) [encoder encodeObject:self.url forKey:@"url"];
-}
-
 @end

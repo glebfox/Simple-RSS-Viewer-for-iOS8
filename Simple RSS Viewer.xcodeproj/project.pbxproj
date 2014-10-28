@@ -21,8 +21,6 @@
 		7E5B894B19D87228006FBC8C /* GGRSSAddFeedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B894519D87228006FBC8C /* GGRSSAddFeedViewController.m */; };
 		7E5B894C19D87228006FBC8C /* GGRSSMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B894719D87228006FBC8C /* GGRSSMasterViewController.m */; };
 		7E5B894D19D87228006FBC8C /* GGRSSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B894919D87228006FBC8C /* GGRSSDetailViewController.m */; };
-		7E5B895419D872DB006FBC8C /* Dimensions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7E5B895119D872DB006FBC8C /* Dimensions.plist */; };
-		7E5B895519D872DB006FBC8C /* GGRSSDimensionsProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B895319D872DB006FBC8C /* GGRSSDimensionsProvider.m */; };
 		7E5B895B19D8730B006FBC8C /* GGRSSFeedsCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B895919D8730B006FBC8C /* GGRSSFeedsCollection.m */; };
 		7E5B896C19D8734A006FBC8C /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B896919D8734A006FBC8C /* NSString+HTML.m */; };
 		7E5B896D19D8734A006FBC8C /* NSDate+InternetDateTime.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B896B19D8734A006FBC8C /* NSDate+InternetDateTime.m */; };
@@ -68,9 +66,6 @@
 		7E5B894719D87228006FBC8C /* GGRSSMasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSMasterViewController.m; sourceTree = "<group>"; };
 		7E5B894819D87228006FBC8C /* GGRSSDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSDetailViewController.h; sourceTree = "<group>"; };
 		7E5B894919D87228006FBC8C /* GGRSSDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSDetailViewController.m; sourceTree = "<group>"; };
-		7E5B895119D872DB006FBC8C /* Dimensions.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Dimensions.plist; sourceTree = "<group>"; };
-		7E5B895219D872DB006FBC8C /* GGRSSDimensionsProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSDimensionsProvider.h; sourceTree = "<group>"; };
-		7E5B895319D872DB006FBC8C /* GGRSSDimensionsProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSDimensionsProvider.m; sourceTree = "<group>"; };
 		7E5B895819D8730B006FBC8C /* GGRSSFeedsCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GGRSSFeedsCollection.h; sourceTree = "<group>"; };
 		7E5B895919D8730B006FBC8C /* GGRSSFeedsCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GGRSSFeedsCollection.m; sourceTree = "<group>"; };
 		7E5B896819D8734A006FBC8C /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
@@ -220,9 +215,6 @@
 		7E5B895019D872CF006FBC8C /* Dimensions */ = {
 			isa = PBXGroup;
 			children = (
-				7E5B895119D872DB006FBC8C /* Dimensions.plist */,
-				7E5B895219D872DB006FBC8C /* GGRSSDimensionsProvider.h */,
-				7E5B895319D872DB006FBC8C /* GGRSSDimensionsProvider.m */,
 			);
 			name = Dimensions;
 			sourceTree = "<group>";
@@ -311,7 +303,7 @@
 		7E5B890719D86B8D006FBC8C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Gleb Gorelov";
 				TargetAttributes = {
 					7E5B890E19D86B8D006FBC8C = {
@@ -352,7 +344,6 @@
 				7E5B897419D88696006FBC8C /* Localizable.strings in Resources */,
 				7E175AEB19E3C46100959725 /* FeedsLastUrl.plist in Resources */,
 				7E175AE919E3B99000959725 /* FeedsUrl.plist in Resources */,
-				7E5B895419D872DB006FBC8C /* Dimensions.plist in Resources */,
 				7E5B892019D86B8E006FBC8C /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -377,7 +368,6 @@
 				7E48B74719E185450019C661 /* GGRSSFeedItemInfo.m in Sources */,
 				7E5B895B19D8730B006FBC8C /* GGRSSFeedsCollection.m in Sources */,
 				7E5B894B19D87228006FBC8C /* GGRSSAddFeedViewController.m in Sources */,
-				7E5B895519D872DB006FBC8C /* GGRSSDimensionsProvider.m in Sources */,
 				7E5B894A19D87228006FBC8C /* GGRSSFeedsTableViewController.m in Sources */,
 				7E5B891519D86B8E006FBC8C /* main.m in Sources */,
 				7E5B894C19D87228006FBC8C /* GGRSSMasterViewController.m in Sources */,
@@ -464,7 +454,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;

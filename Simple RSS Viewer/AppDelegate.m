@@ -65,4 +65,20 @@
 //    NSLog(@"applicationWillTerminate");
 }
 
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler
+{
+    NSLog(@"application handleEventsForBackgroundURLSession");
+    //при помощи уведомления будем видеть, когда загрузка закончена
+//    UILocalNotification* locNot = [[UILocalNotification alloc] init];
+//    locNot.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+//    locNot.alertBody = [NSString stringWithFormat:@"still alive!"];
+//    locNot.timeZone = [NSTimeZone defaultTimeZone];
+//    [[UIApplication sharedApplication] scheduleLocalNotification:locNot];
+    
+    //среди аргументов висит загадочный хендлер - его надо вызвать, чтобы сообщить системе о том,
+    //что мы обновили UI и можно делать новый снапшот для многозадачного меню.
+    //Потому сохраним его до лучших времен
+    self.backgroundSessionCompletionHandler = completionHandler;
+}
+
 @end

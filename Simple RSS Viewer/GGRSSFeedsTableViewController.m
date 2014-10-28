@@ -7,11 +7,8 @@
 //
 
 #import "GGRSSFeedsTableViewController.h"
-#import "GGRSSFeedsCollection.h"
-#import "GGRSSDimensionsProvider.h"
 #import "GGRSSMasterViewController.h"
-
-NSString *observerKey = @"feeds";
+#import "GGRSSFeedsCollection.h"
 
 @interface GGRSSFeedsTableViewController ()
 
@@ -21,11 +18,44 @@ NSString *observerKey = @"feeds";
 
 @synthesize url;
 
+#pragma mark - init
+
+- (id)init {
+    if ((self = [super init])) {
+        [self ggrssFeedsTableViewInit];
+    }
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if ((self = [super initWithCoder:aDecoder])) {
+        [self ggrssFeedsTableViewInit];
+    }
+    return self;
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+        [self ggrssFeedsTableViewInit];
+    }
+    return self;
+}
+
+- (id)initWithStyle:(UITableViewStyle)style {
+    if ((self = [super initWithStyle:style])) {
+        [self ggrssFeedsTableViewInit];
+    }
+    return self;
+}
+
+- (void)ggrssFeedsTableViewInit {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedsDidChanged:) name:GGRSSFeedsCollectionChangedNotification object:nil];
+}
+
+#pragma mark - View lifecycle
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // Подписываемся на изменения в списке фидов
-    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:observerKey options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -35,10 +65,7 @@ NSString *observerKey = @"feeds";
 
 - (void)dealloc
 {
-    NSLog(@"GGRSSFeedsTableViewController - dealloc");
-    [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:observerKey];
-    
-    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Table view data source
@@ -61,11 +88,9 @@ NSString *observerKey = @"feeds";
         GGRSSFeedInfo *info = self.feedsToDisplay[indexPath.row];
         
         // Заголовок будет хранить название фида
-        cell.textLabel.font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"FeedsTableView_TitleSize"]];
         cell.textLabel.text = info.title;
     
         // Подзаголовок будет хранить адрес фида
-        cell.detailTextLabel.font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"FeedsTableView_SubtitleSize"]];
         cell.detailTextLabel.text = [info.url absoluteString];
         
         if ([[[GGRSSFeedsCollection sharedInstance] lastUsedUrl] isEqual:info.url]) {
@@ -95,15 +120,11 @@ NSString *observerKey = @"feeds";
     }   
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    // Если список фидов был изменен, то обновляем таблицу
-    if ([keyPath isEqualToString:observerKey]) {
-        self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
-        [self.tableView reloadData];
-    } else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-    }
+#pragma mark - GGRSSFeedsCollectionNotification
+
+- (void)feedsDidChanged:(NSNotification *)notification {
+    self.feedsToDisplay = [[GGRSSFeedsCollection sharedInstance] allFeeds];
+    [self.tableView reloadData];
 }
 
 #pragma mark - Navigation

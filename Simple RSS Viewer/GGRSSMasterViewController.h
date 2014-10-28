@@ -9,7 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "GGRSSFeedParser.h"
 
+//@class GGRSSMasterViewController;
+//
+//@protocol GGRSSMasterViewControllerAlertDelegate <NSObject>
+//
+//- (void)masterView:(GGRSSMasterViewController *)masterView showAlertWithMessage:(NSString *)message;
+//
+//@end
+
 @interface GGRSSMasterViewController : UIViewController <GGRSSFeedParserDelegate>
+
+//@property (weak) id<GGRSSMasterViewControllerAlertDelegate> delegate;
 
 - (void)setParserWithUrl:(NSURL *)url delegate:(id<GGRSSFeedParserDelegate>)delegate;
 

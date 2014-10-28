@@ -10,6 +10,14 @@
 #import "GGRSSFeedInfo.h"
 #import "GGRSSFeedItemInfo.h"
 
+// Коды ошибок
+enum
+{
+    GGRSS_ERROR_CODE_NOT_INITIATED,
+    GGRSS_ERROR_CODE_CONNECTION_FAILED,
+    GGRSS_ERROR_CODE_XML_PARSING_ERROR
+};
+
 @class GGRSSFeedParser;
 
 @protocol GGRSSFeedParserDelegate <NSObject>

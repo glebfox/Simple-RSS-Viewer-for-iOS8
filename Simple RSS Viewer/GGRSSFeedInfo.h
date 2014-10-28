@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface GGRSSFeedInfo : NSObject <NSCoding>
+@interface GGRSSFeedInfo : NSObject
 
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSURL *link;

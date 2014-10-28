@@ -9,10 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "GGRSSFeedInfo.h"
 
+
+
 @interface GGRSSFeedsCollection : NSObject
 
 + (id)sharedInstance;
 
+//@property (nonatomic, weak) id <GGRSSFeedsCollectionDelegate> delegate;
 @property (nonatomic, strong) NSURL *lastUsedUrl;
 
 - (void)addFeedWithTitle:(NSString *)title url:(NSString *)urlString;
@@ -21,3 +24,5 @@
 - (void)saveFeeds;
 
 @end
+
+NSString *const GGRSSFeedsCollectionChangedNotification;    // UIKIT_EXTERN - надо?

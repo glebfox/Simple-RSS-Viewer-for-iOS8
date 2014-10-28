@@ -8,19 +8,15 @@
 
 #import "GGRSSFeedParser.h"
 #import "NSDate+InternetDateTime.h"
+#import "AppDelegate.h"
 
-// Коды ошибок
-#define GGRSSErrorCodeNotInitiated      1
-#define GGRSSErrorCodeConnectionFailed  2
-#define GGRSSErrorCodeXmlParsingError   3
-
-@interface GGRSSFeedParser () <NSXMLParserDelegate>
+@interface GGRSSFeedParser () <NSXMLParserDelegate>//, NSURLSessionDownloadDelegate>
 
 // Свойства для скачивания инфы
 @property (nonatomic, copy) NSURL *url;
 @property (nonatomic, strong) NSURLRequest *request;
-@property (nonatomic, strong) NSURLConnection *urlConnection;
-@property (nonatomic, strong) NSMutableData *asyncData;
+
+//@property (nonatomic, strong) NSURLSessionDownloadTask *downloadTask;
 
 // Свойства для процесса парсинга
 @property (nonatomic, strong) NSXMLParser *xmlParser;
@@ -77,62 +73,66 @@
 #pragma mark - Parsing
 
 - (void)reset {
-    self.asyncData = nil;
-    self.urlConnection = nil;
     self.foundCharacters = nil;
     self.currentFeedItemInfo = nil;
     self.feedInfo = nil;
     self.isItem = NO;
+
+//    self.downloadTask = nil;
 }
 
 - (BOOL)parse {
     
     if (!self.url || !self.delegate) {
-        [self parsingFailedWithErrorCode:GGRSSErrorCodeNotInitiated andDescription:@"Delegate or URL not specified"];
+        [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_NOT_INITIATED andDescription:NSLocalizedString(@"Delegate or URL not specified", nil)];
         return NO;
     }
     
     [self reset];
     
-    self.asyncData = [[NSMutableData alloc] init];
-    self.urlConnection = [[NSURLConnection alloc] initWithRequest:self.request delegate:self];
-    if (self.urlConnection) {
-        return YES;
-    } else {
-        [self parsingFailedWithErrorCode:GGRSSErrorCodeConnectionFailed
-                          andDescription:[NSString stringWithFormat:@"Asynchronous connection failed to URL: %@", self.url]];
-        self.asyncData = nil;
-        return NO;
-    }
+    NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration ] delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
+    [[session dataTaskWithRequest: self.request
+                        completionHandler:^(NSData *data, NSURLResponse *response,
+                                            NSError *error) {
+                            if (error) {
+                                [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_CONNECTION_FAILED
+                                                           andDescription:[NSString stringWithFormat:NSLocalizedString(@"Asynchronous connection failed to URL: %@", nil), self.url]];
+                            } else {
+                                [self startParsingData:data];
+                                [self reset];
+                            }
+                        }] resume];
+    
+    return YES;
 }
 
 // После того, как данные загрузятся из инета, этот метод разберет XML текст на состовляющие
 - (void)startParsingData:(NSData *)data {
-    
-        if (data) {
+    NSLog(@"startParsingData");
+    if (data) {
+        
+        // Если данные есть, то должна быть и информация про фид
+        GGRSSFeedInfo *feedInfo = [[GGRSSFeedInfo alloc] init];
+        self.foundCharacters = [[NSMutableString alloc] init];
+        feedInfo.url = self.url;
+        self.feedInfo = feedInfo;
+        
+        // Создаем NSXMLParser
+        NSXMLParser *newXmlParser = [[NSXMLParser alloc] initWithData:data];
+        self.xmlParser = newXmlParser;
+        if (self.xmlParser) {
             
-            // Если данные есть, то должна быть и информация про фид
-            GGRSSFeedInfo *feedInfo = [[GGRSSFeedInfo alloc] init];
-            self.foundCharacters = [[NSMutableString alloc] init];
-            feedInfo.url = self.url;
-            self.feedInfo = feedInfo;
+            // Запускаем парсинг
+            self.xmlParser.delegate = self;
+            [self.xmlParser parse];
+            self.xmlParser = nil;
             
-            // Создаем NSXMLParser
-            NSXMLParser *newXmlParser = [[NSXMLParser alloc] initWithData:data];
-            self.xmlParser = newXmlParser;
-            if (self.xmlParser) {
-                
-                // Запускаем парсинг
-                self.xmlParser.delegate = self;
-                [self.xmlParser parse];
-                self.xmlParser = nil;
-                
-            } else {
-                [self parsingFailedWithErrorCode:GGRSSErrorCodeXmlParsingError andDescription:@"Feed not a valid XML document"];
-            }
         } else {
-            [self parsingFailedWithErrorCode:GGRSSErrorCodeXmlParsingError andDescription:@"Error with feed encoding"];
+            [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_XML_PARSING_ERROR andDescription:NSLocalizedString(@"Feed not a valid XML document", nil)];
         }
+    } else {
+        [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_XML_PARSING_ERROR andDescription:NSLocalizedString(@"Error with feed encoding", nil)];
+    }
 }
 
 - (void)stopParsing {
@@ -149,6 +149,8 @@
 
 // В случае ошибок, создаем NSError и отпраляем делегату
 - (void)parsingFailedWithErrorCode:(int)code andDescription:(NSString *)description {
+    NSLog(@"parsingFailedWithErrorCode: code = %d", code);
+    NSLog(@"parsingFailedWithErrorCode: description = %@", description);
     NSError *error = [NSError errorWithDomain:@"GGRSSFeedParser"
                               code:code
                               userInfo:[NSDictionary dictionaryWithObject:description
@@ -163,6 +165,9 @@
     if ([self.delegate respondsToSelector:@selector(feedParser:didFailWithError:)])
         [self.delegate feedParser:self didFailWithError:error];
 }
+
+#pragma mark - NSURLSessionDelegate
+
 
 #pragma mark - NSXMLParserDelegate
 
@@ -230,34 +235,7 @@
 
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
 {
-    [self parsingFailedWithErrorCode:GGRSSErrorCodeXmlParsingError andDescription:[parseError localizedDescription]];
-}
-
-#pragma mark - NSURLConnection Delegate (Async)
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    [self.asyncData setLength:0];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self.asyncData appendData:data];
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    [self reset];
-    [self parsingFailedWithErrorCode:GGRSSErrorCodeConnectionFailed andDescription:[error localizedDescription]];
-    
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [self startParsingData:self.asyncData];
-    [self reset];
-}
-
-
-
--(NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-    return nil;
+    [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_XML_PARSING_ERROR andDescription:[parseError localizedDescription]];
 }
 
 #pragma mark - Send Items to Delegate

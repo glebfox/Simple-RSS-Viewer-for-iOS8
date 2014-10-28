@@ -9,12 +9,9 @@
 #import "GGRSSMasterViewController.h"
 #import "GGRSSDetailViewController.h"
 #import "GGRSSFeedsCollection.h"
-#import "GGRSSDimensionsProvider.h"
 #import "GGRSSFeedsTableViewController.h"
 #import "GGRSSFeedUrlSource.h"
 #import "NSString+HTML.h"
-
-NSString *oKey = @"feeds";
 
 @interface GGRSSMasterViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -34,6 +31,39 @@ NSString *oKey = @"feeds";
 
 @implementation GGRSSMasterViewController
 
+#pragma mark - init
+
+- (id)init {
+    if ((self = [super init])) {
+        [self ggrssMasterViewInit];
+    }
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if ((self = [super initWithCoder:aDecoder])) {
+        [self ggrssMasterViewInit];
+    }
+    return self;
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+        [self ggrssMasterViewInit];
+    }
+    return self;
+}
+
+- (void) ggrssMasterViewInit {
+//    NSLog(@"ggrssMasterViewInit");
+    // Инициализируем форматтер даты и времени
+    self.formatter = [NSDateFormatter new];
+    [self.formatter setDateStyle:NSDateFormatterShortStyle];
+    [self.formatter setTimeStyle:NSDateFormatterShortStyle];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedsDidChanged:) name:GGRSSFeedsCollectionChangedNotification object:nil];
+}
+
 #pragma mark - View lifecycle
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -46,13 +76,15 @@ NSString *oKey = @"feeds";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    NSLog(@"master - viewDidLoad");
     // Иниализируем активити индикатор
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:self.refreshControl];
     
-    [[GGRSSFeedsCollection sharedInstance] addObserver:self forKeyPath:oKey options:NSKeyValueObservingOptionNew context:nil];
+    if (self.newFeedParsing) {
+        [self prepareUIforParsing];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -62,8 +94,7 @@ NSString *oKey = @"feeds";
 
 - (void)dealloc
 {
-//    NSLog(@"GGRSSMasterController - dealloc");
-    [[GGRSSFeedsCollection sharedInstance] removeObserver:self forKeyPath:oKey];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Parsing
@@ -74,8 +105,7 @@ NSString *oKey = @"feeds";
     if (url != nil) {
         // Обновляем заголовок формы, запускаем анимацию и скрываем таблицу, чтобы было видно анимацию
         self.title = NSLocalizedString (@"MasterViewTitle_Loading", nil);
-        [self.spinner startAnimating];
-        self.tableView.hidden = YES;
+        [self prepareUIforParsing];
     
         // Если не первый запуск, то останавливаем прерыдущий парсинг и обнуляем парсер
         if (self.feedParser != nil) {
@@ -110,28 +140,32 @@ NSString *oKey = @"feeds";
 
 - (void)updateTableWithParsedItems
 {
+    NSLog(@"updateTableWithParsedItems");
     // Сортируем элементы по дате
     self.itemsToDisplay = [self.parsedItems sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO]]];
     [self.tableView reloadData];
     // Отображаем таблицу и завершаем анимации обновления
     self.tableView.hidden = NO;
-    [self.refreshControl endRefreshing];
-    [self.spinner stopAnimating];
     // Перемещаем фокут к самой верхней записи
     [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:NO];
+}
+
+- (void)prepareUIforParsing {
+    [self.spinner startAnimating];
+    self.tableView.hidden = YES;
 }
 
 #pragma mark - GGRSSFeedParserDelegate
 
 - (void)feedParserDidStart:(GGRSSFeedParser *)parser
 {
-//    NSLog(@"Started Parsing: %@", parser.url);
+    NSLog(@"Started Parsing: %@", parser.url);
     [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:self.feedParser.url];
 }
 
 - (void)feedParser:(GGRSSFeedParser *)parser didParseFeedInfo:(GGRSSFeedInfo *)info
 {
-//    NSLog(@"Parsed Feed Info: “%@”", info.title);
+    NSLog(@"Parsed Feed Info: “%@”", info.title);
     if (self.isNewFeedParsing) {
         [[GGRSSFeedsCollection sharedInstance] addFeedWithTitle:info.title url:[info.url absoluteString]];
         self.newFeedParsing = NO;
@@ -147,43 +181,53 @@ NSString *oKey = @"feeds";
 
 - (void)feedParserDidFinish:(GGRSSFeedParser *)parser
 {
-//    NSLog(@"Finished Parsing%@", (parser.stopped ? @" (Stopped)" : @""));
-//    NSLog(@"Finished Parsing");
-    [self updateTableWithParsedItems];
+    NSLog(@"Finished Parsing");
+    
+    [self.refreshControl endRefreshing];
+    [self updateTableWithParsedItems];    
+    [self.spinner stopAnimating];
 }
 
 - (void)feedParser:(GGRSSFeedParser *)parser didFailWithError:(NSError *)error
 {
     // В случае ошибки формируем предупреждение для пользователя
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
-                                                    message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
-                                                   delegate:nil
-                                          cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
-                                          otherButtonTitles:nil];
+    if ([UIAlertController class]) {
+        NSLog(@"UIAlertController");
+        UIAlertController * alertController=   [UIAlertController
+                                                alertControllerWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
+                                                message:[error localizedDescription]
+                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* cancel = [UIAlertAction
+                                 actionWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action)
+                                 {
+                                     [alertController dismissViewControllerAnimated:YES completion:nil];
+                                     
+                                 }];
+        [alertController addAction:cancel];
+        [self presentViewController:alertController animated:YES completion:nil];
+    } else {
+        NSLog(@"UIAlertView");
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
+                                                        message: [error localizedDescription]
+                                                       delegate:nil
+                                              cancelButtonTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
+    
     // Очищаем итемы для отображения, чтобы таблица оказалась пустой
     if (self.parsedItems.count > 0)
         [self.parsedItems removeAllObjects];
-    [alert show];
-    self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
-    [self updateTableWithParsedItems];
-    [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
     
-//    UIAlertController * alertController=   [UIAlertController
-//                                  alertControllerWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_Title", nil)
-//                                  message:NSLocalizedString (@"AlertViewParsingIncomplete_Message", nil)
-//                                  preferredStyle:UIAlertControllerStyleAlert];
-//    
-//    UIAlertAction* cancel = [UIAlertAction
-//                             actionWithTitle:NSLocalizedString (@"AlertViewParsingIncomplete_CancelButtonTitle", nil)
-//                             style:UIAlertActionStyleDefault
-//                             handler:^(UIAlertAction * action)
-//                             {
-//                                 [alertController dismissViewControllerAnimated:YES completion:nil];
-//                                 
-//                             }];
-//    [alertController addAction:cancel];
-//    
-//    [self presentViewController:alertController animated:YES completion:nil];
+    self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
+    [self feedParserDidFinish:parser];    
+    [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
+    if (error.code != GGRSS_ERROR_CODE_CONNECTION_FAILED) {
+        self.feedParser = nil;
+    }
 }
 
 
@@ -203,6 +247,7 @@ NSString *oKey = @"feeds";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+//    NSLog(@"cellForRowAtIndexPath");
     static NSString *CellIdentider = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentider forIndexPath:indexPath];
     
@@ -212,7 +257,7 @@ NSString *oKey = @"feeds";
         if (item) {
             // Заголовок строки = заголовок новости. Полужирное начертание
             NSString *itemTitle = item.title ? [item.title stringByConvertingHTMLToPlainText]:NSLocalizedString (@"MasterView_FeedNoTitle", nil);
-            UIFont *font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"MasterTableView_TitleSize"]];
+            UIFont *font = [UIFont boldSystemFontOfSize:14];
         
             NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
         
@@ -220,7 +265,7 @@ NSString *oKey = @"feeds";
         
             // Оставшееся место в заголовке строки заполняем описанием новости. Обычное написание, шрифт поменьше.
             if (item.summary) {
-                font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"MasterTableView_SummarySize"]];
+                font = [UIFont systemFontOfSize:12];
                 attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
                 NSMutableAttributedString *summary = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@", [[item.summary stringByConvertingHTMLToPlainText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]] attributes:attributes];
             
@@ -230,12 +275,6 @@ NSString *oKey = @"feeds";
         
             // Подзаголовок строки = дата новости
             if (item.date) {
-                // Инициализируем форматтер даты и времени
-                self.formatter = [NSDateFormatter new];
-                [self.formatter setDateStyle:NSDateFormatterShortStyle];
-                [self.formatter setTimeStyle:NSDateFormatterShortStyle];
-            
-                cell.detailTextLabel.font = font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"MasterTableView_SubtitleSize"]];
                 cell.detailTextLabel.text = [NSString stringWithFormat:@"%@", [self.formatter stringFromDate:item.date]];
             }
         }
@@ -244,19 +283,16 @@ NSString *oKey = @"feeds";
     return cell;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if ([keyPath isEqualToString:oKey]) {
-        // Если вдруг удалили из списка активный фид, то очищаем таблицу и заносим пустую ссылку в ресурсы
-        if ([self lastUsedFeedDeleted]) {
-            [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
-            self.itemsToDisplay = nil;
-            self.feedParser = nil;
-            self.title = @"";
-            [self.tableView reloadData];
-        }
-    } else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+#pragma mark - GGRSSFeedsCollectionNotification
+
+- (void)feedsDidChanged:(NSNotification *)notification {
+    // Если вдруг удалили из списка активный фид, то очищаем таблицу и заносим пустую ссылку в ресурсы
+    if ([self lastUsedFeedDeleted]) {
+        [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
+        self.itemsToDisplay = nil;
+        self.feedParser = nil;
+        self.title = @"";
+        [self.tableView reloadData];
     }
 }
 
@@ -309,7 +345,7 @@ NSString *oKey = @"feeds";
         id <GGRSSFeedUrlSource> sourse = [segue sourceViewController];
         NSURL *newUrl = sourse.url;
         // Поэтому, если url не пустой и не равен уже загруженному фиду, то запускаем новый парсинг
-        if (newUrl != nil && ![self.feedParser.url isEqual:newUrl]) {
+        if (newUrl != nil ) { //&& ![self.feedParser.url isEqual:newUrl]
             [self setParserWithUrl:newUrl delegate:self];
         }
     }

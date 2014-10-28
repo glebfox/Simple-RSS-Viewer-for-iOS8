@@ -6,5 +6,7 @@
 	<string>http://images.apple.com/main/rss/hotnews/hotnews.rss</string>
 	<key>TechCrunch</key>
 	<string>http://techcrunch.com/feed/</string>
+	<key>Apple Inc. Press Releases</key>
+	<string>http://www.apple.com/pr/feeds/pr.rss</string>
 </dict>
 </plist>

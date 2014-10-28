@@ -7,7 +7,6 @@
 //
 
 #import "GGRSSDetailViewController.h"
-#import "GGRSSDimensionsProvider.h"
 #import "NSString+HTML.h"
 
 @interface GGRSSDetailViewController ()
@@ -36,12 +35,6 @@
     [super viewDidLoad];
     
     self.textView.attributedText = self.detailText;
-    
-    // Если в информации имеется ссылка на новость в интернете, то к форме добавляется кнопка для перехода
-    if (self.detailItem.link) {
-        UIBarButtonItem *moreButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString (@"DetailView_ButtonMore", nil) style:UIBarButtonItemStylePlain target:self action:@selector(goLink:)];
-        self.navigationItem.rightBarButtonItem = moreButton;
-    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -77,7 +70,7 @@
         
         // Заголовок новости получает полужирное начертание с размером взятым из ресурсов (больше чем у остального текста)
         if (self.detailItem.title) {
-            UIFont *font = [UIFont boldSystemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"DetailView_TitleSize"]];
+            UIFont *font = [UIFont boldSystemFontOfSize:18];
             NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
             
             NSMutableAttributedString *titleString = [[NSMutableAttributedString alloc] initWithString:[self.detailItem.title stringByConvertingHTMLToPlainText] attributes:attributes];
@@ -92,7 +85,7 @@
             [formatter setDateStyle:NSDateFormatterShortStyle];
             [formatter setTimeStyle:NSDateFormatterShortStyle];
             
-            UIFont *font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"DetailView_DateSize"]];
+            UIFont *font = [UIFont systemFontOfSize:12];
             NSDictionary *attributes = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
             
             NSMutableAttributedString *dateString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n\n%@\n\n",[formatter stringFromDate:self.detailItem.date]] attributes:attributes];
@@ -108,8 +101,8 @@
         if (self.detailItem.summary) {
             
             NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-            paragraphStyle.lineSpacing = [[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"DetailView_SummaryLineSpacing"];
-            UIFont *font = [UIFont systemFontOfSize:[[GGRSSDimensionsProvider sharedInstance] dimensionByName:@"DetailView_SummarySize"]];
+            paragraphStyle.lineSpacing = 5;
+            UIFont *font = [UIFont systemFontOfSize:16];
 //            NSDictionary *attributes = [NSDictionary dictionaryWithObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
             NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:paragraphStyle, NSParagraphStyleAttributeName, font, NSFontAttributeName, nil];
             
@@ -119,6 +112,12 @@
         }
         
         self.detailText = detailInformation;
+        
+        // Если в информации имеется ссылка на новость в интернете, то к форме добавляется кнопка для перехода
+        if (self.detailItem.link) {
+            UIBarButtonItem *moreButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString (@"DetailView_ButtonMore", nil) style:UIBarButtonItemStylePlain target:self action:@selector(goLink:)];
+            self.navigationItem.rightBarButtonItem = moreButton;
+        }
     }
 }
 
