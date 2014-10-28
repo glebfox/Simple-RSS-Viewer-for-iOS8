@@ -109,8 +109,6 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
     
     [self reset];
     
-    self.downloadTask = [self.session downloadTaskWithRequest:self.request];
-    [self.downloadTask resume];
 //    NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration ] delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
 //    [[session dataTaskWithRequest: self.request
 //                completionHandler:^(NSData *data, NSURLResponse *response,
@@ -123,6 +121,9 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 //                        [self reset];
 //                    }
 //                }] resume];
+    
+    self.downloadTask = [self.session downloadTaskWithRequest:self.request];
+    [self.downloadTask resume];
     
     return YES;
 }
@@ -157,6 +158,7 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 }
 
 - (void)stopParsing {
+    [self.downloadTask cancel];
     [self.xmlParser abortParsing];
 }
 
@@ -183,8 +185,10 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
     
     [self reset];
     
-    if ([self.delegate respondsToSelector:@selector(feedParser:didFailWithError:)])
-        [self.delegate feedParser:self didFailWithError:error];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(feedParser:didFailWithError:)])
+            [self.delegate feedParser:self didFailWithError:error];
+    });
 }
 
 #pragma mark - NSURLSessionDelegate
@@ -222,9 +226,10 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-    if (error)
+    if (error && error.code != -999) { // -999 = cancelled
         [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_CONNECTION_FAILED
                           andDescription:[NSString stringWithFormat:NSLocalizedString(@"Asynchronous connection failed to URL: %@", nil), self.url]];
+    }
 }
 
 
@@ -242,7 +247,6 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
     
     NSLog(@"All tasks are finished");
 }
-
 
 //-(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didResumeAtOffset:(int64_t)fileOffset expectedTotalBytes:(int64_t)expectedTotalBytes
 //{

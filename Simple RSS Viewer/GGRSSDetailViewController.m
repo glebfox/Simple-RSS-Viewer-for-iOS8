@@ -52,10 +52,8 @@
     [self configureDetailText];
     
     if (self.textView) {
-//        NSLog(@"Detail - setDetailItem: - self.textView");
         self.textView.attributedText = self.detailText;
     } else {
-//        NSLog(@"Detail - setDetailItem: - !self.textView");
     }
 }
 

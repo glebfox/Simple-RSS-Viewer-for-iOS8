@@ -67,6 +67,11 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="wdJ-iV-B5q">
+                        <barButtonItem key="leftBarButtonItem" enabled="NO" systemItem="stop" id="24L-aP-jTj">
+                            <connections>
+                                <action selector="stop:" destination="SXC-ho-TrL" id="wRV-cG-oWm"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Feeds" id="SC5-ct-oyY">
                             <connections>
                                 <segue destination="9td-bP-K2q" kind="show" identifier="showFeeds" id="dqZ-Lc-CJV"/>
@@ -75,6 +80,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="spinner" destination="3bL-hu-WXK" id="Uwk-qO-JGz"/>
+                        <outlet property="stopButton" destination="24L-aP-jTj" id="q84-sT-Vsj"/>
                         <outlet property="tableView" destination="VJ6-a1-OC3" id="JyJ-Xp-sMN"/>
                     </connections>
                 </viewController>

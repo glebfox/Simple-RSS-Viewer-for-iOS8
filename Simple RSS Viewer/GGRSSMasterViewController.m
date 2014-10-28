@@ -17,6 +17,7 @@
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *stopButton;
 
 @property (strong, nonatomic) GGRSSFeedParser *feedParser;
 @property (strong, nonatomic) NSMutableArray *parsedItems;
@@ -80,7 +81,7 @@
     // Иниализируем активити индикатор
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
-    [self.tableView addSubview:self.refreshControl];
+//    [self.tableView addSubview:self.refreshControl];
     
     if (self.newFeedParsing) {
         [self prepareUIforParsing];
@@ -106,7 +107,7 @@
         // Обновляем заголовок формы, запускаем анимацию и скрываем таблицу, чтобы было видно анимацию
         self.title = NSLocalizedString (@"MasterViewTitle_Loading", nil);
         [self prepareUIforParsing];
-
+        
         // Если не первый запуск, то останавливаем прерыдущий парсинг и обнуляем парсер
         if (self.feedParser != nil) {
             [self.feedParser stopParsing];
@@ -118,6 +119,7 @@
         self.parsedItems = nil;
         self.parsedItems = [NSMutableArray new];
         self.newFeedParsing = YES;
+        self.stopButton.enabled = YES;
         [self.feedParser parse];
     }
 }
@@ -130,10 +132,17 @@
         [self.parsedItems removeAllObjects];
         [self.feedParser stopParsing];
         self.newFeedParsing = NO;
+        self.stopButton.enabled = YES;
         [self.feedParser parse];
     } else {
         [self.refreshControl endRefreshing];
     }
+}
+
+- (IBAction)stop:(id)sender {
+    [self.feedParser stopParsing];
+    [self feedParserDidFinish:nil];
+    self.title = @"";
 }
 
 - (void)updateTableWithParsedItems
@@ -151,6 +160,7 @@
 - (void)prepareUIforParsing {
     [self.spinner startAnimating];
     self.tableView.hidden = YES;
+    [self.tableView addSubview:self.refreshControl];
 }
 
 #pragma mark - GGRSSFeedParserDelegate
@@ -180,7 +190,7 @@
 - (void)feedParserDidFinish:(GGRSSFeedParser *)parser
 {
     NSLog(@"Finished Parsing");
-    
+    self.stopButton.enabled = NO;
     [self.refreshControl endRefreshing];
     [self updateTableWithParsedItems];    
     [self.spinner stopAnimating];
@@ -224,6 +234,10 @@
     self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
     [self feedParserDidFinish:parser];    
     [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
+    
+    if (error.code != GGRSS_ERROR_CODE_CONNECTION_FAILED) {
+        [self.refreshControl removeFromSuperview];
+    }
 }
 
 
