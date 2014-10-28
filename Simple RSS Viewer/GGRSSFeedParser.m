@@ -10,13 +10,15 @@
 #import "NSDate+InternetDateTime.h"
 #import "AppDelegate.h"
 
-@interface GGRSSFeedParser () <NSXMLParserDelegate>//, NSURLSessionDownloadDelegate>
+@interface GGRSSFeedParser () <NSXMLParserDelegate, NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate>
 
 // Свойства для скачивания инфы
-@property (nonatomic, copy) NSURL *url;
-@property (nonatomic, strong) NSURLRequest *request;
+//@property (nonatomic, copy) NSURL *url;
+//@property (nonatomic, strong) NSURLRequest *request;
+@property (nonatomic, strong) NSData *data;
 
-//@property (nonatomic, strong) NSURLSessionDownloadTask *downloadTask;
+@property (nonatomic, strong) NSURLSession *session;
+@property (nonatomic, strong) NSURLSessionDownloadTask *downloadTask;
 
 // Свойства для процесса парсинга
 @property (nonatomic, strong) NSXMLParser *xmlParser;
@@ -39,6 +41,8 @@
         self.dateFormatterRFC822 = [[NSDateFormatter alloc] init];
         [self.dateFormatterRFC822 setLocale:en_US_POSIX];
         [self.dateFormatterRFC822 setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+        
+        self.session = [self backgroundSession];
     }
     return self;
 }
@@ -53,10 +57,10 @@
         self.url = feedURL;
 
         // Создаем request
-        NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:self.url
-                                                                cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-                                                            timeoutInterval:60];
-        self.request = req;
+//        NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:self.url
+//                                                                cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+//                                                            timeoutInterval:60];
+//        self.request = req;
         
     }
     return self;
@@ -64,7 +68,7 @@
 
 - (id)initWithFeedRequest:(NSMutableURLRequest *)feedRequest {
     if (self = [self init]) {
-        self.url = feedRequest.URL;
+//        self.url = feedRequest.URL;
         self.request = feedRequest;
     }
     return self;
@@ -72,13 +76,27 @@
 
 #pragma mark - Parsing
 
+- (NSURLSession *)backgroundSession
+{
+    /*
+     Using disptach_once here ensures that multiple background sessions with the same identifier are not created in this instance of the application. If you want to support multiple background sessions within a single process, you should create each session with its own identifier.
+     */
+    static NSURLSession *session = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration backgroundSessionConfiguration:@"com.gorelov.SimpleRSSViewer.BackgroundSession"];
+        session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
+    });
+    
+    return session;
+}
+
 - (void)reset {
     self.foundCharacters = nil;
     self.currentFeedItemInfo = nil;
     self.feedInfo = nil;
     self.isItem = NO;
-
-//    self.downloadTask = nil;
+    self.downloadTask = nil;
 }
 
 - (BOOL)parse {
@@ -90,18 +108,8 @@
     
     [self reset];
     
-    NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration ] delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
-    [[session dataTaskWithRequest: self.request
-                        completionHandler:^(NSData *data, NSURLResponse *response,
-                                            NSError *error) {
-                            if (error) {
-                                [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_CONNECTION_FAILED
-                                                           andDescription:[NSString stringWithFormat:NSLocalizedString(@"Asynchronous connection failed to URL: %@", nil), self.url]];
-                            } else {
-                                [self startParsingData:data];
-                                [self reset];
-                            }
-                        }] resume];
+    self.downloadTask = [self.session downloadTaskWithRequest:self.request];
+    [self.downloadTask resume];
     
     return YES;
 }
@@ -168,6 +176,90 @@
 
 #pragma mark - NSURLSessionDelegate
 
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
+{
+    /*
+     Report progress on the task.
+     If you created more than one task, you might keep references to them and report on them individually.
+     */
+    
+    if (downloadTask == self.downloadTask)
+    {
+        double progress = (double)totalBytesWritten / (double)totalBytesExpectedToWrite;
+        NSLog(@"progress: %lf", progress);
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            self.progressView.progress = progress;
+//        });
+    }
+}
+
+
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)downloadURL
+{
+    /*
+     The download completed, you need to copy the file at targetPath before the end of this block.
+     As an example, copy the file to the Documents directory of your app.
+     */
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//    
+//    NSArray *URLs = [fileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+//    NSURL *documentsDirectory = [URLs objectAtIndex:0];
+//    
+//    NSURL *originalURL = [[downloadTask originalRequest] URL];
+//    NSURL *destinationURL = [documentsDirectory URLByAppendingPathComponent:[originalURL lastPathComponent]];
+//    NSError *errorCopy;
+//    
+//    // For the purposes of testing, remove any esisting file at the destination.
+//    [fileManager removeItemAtURL:destinationURL error:NULL];
+//    BOOL success = [fileManager copyItemAtURL:downloadURL toURL:destinationURL error:&errorCopy];
+//    
+//    if (success)
+//    {
+    NSData *data = [NSData dataWithContentsOfURL:downloadURL];
+        dispatch_async(dispatch_get_main_queue(), ^{
+//            [self startParsingData:[NSData dataWithContentsOfFile:[destinationURL path]]];
+            [self startParsingData:data];
+            [self reset];
+        });
+//    }
+//    else
+//    {
+//        /*
+//         In the general case, what you might do in the event of failure depends on the error and the specifics of your application.
+//         */
+//        NSLog(@"Error during the copy: %@", [errorCopy localizedDescription]);
+//    }
+}
+
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+{
+    if (error)
+        [self parsingFailedWithErrorCode:GGRSS_ERROR_CODE_CONNECTION_FAILED
+                          andDescription:[NSString stringWithFormat:NSLocalizedString(@"Asynchronous connection failed to URL: %@", nil), self.url]];
+}
+
+
+/*
+ If an application has received an -application:handleEventsForBackgroundURLSession:completionHandler: message, the session delegate will receive this message to indicate that all messages previously enqueued for this session have been delivered. At this time it is safe to invoke the previously stored completion handler, or to begin any internal updates that will result in invoking the completion handler.
+ */
+- (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session
+{
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.backgroundSessionCompletionHandler) {
+        void (^completionHandler)() = appDelegate.backgroundSessionCompletionHandler;
+        appDelegate.backgroundSessionCompletionHandler = nil;
+        completionHandler();
+    }
+    
+    NSLog(@"All tasks are finished");
+}
+
+
+//-(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didResumeAtOffset:(int64_t)fileOffset expectedTotalBytes:(int64_t)expectedTotalBytes
+//{
+//    
+//}
 
 #pragma mark - NSXMLParserDelegate
 
@@ -255,6 +347,18 @@
             [self.delegate feedParser:self didParseFeedItem:self.currentFeedItemInfo];
         self.self.currentFeedItemInfo = nil;
     }
+}
+
+#pragma mark - NSURL and NSURLRequest
+
+- (void)setUrl:(NSURL *)url {
+    _url = url;
+    _request = [NSURLRequest requestWithURL:self.url];
+}
+
+- (void)setRequest:(NSURLRequest *)request {
+    _request = request;
+    _url = self.request.URL;
 }
 
 @end

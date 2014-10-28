@@ -33,10 +33,12 @@ enum
 @interface GGRSSFeedParser : NSObject
 
 @property (nonatomic, weak) id <GGRSSFeedParserDelegate> delegate;
+@property (nonatomic, copy) NSURL *url;
+@property (nonatomic, copy) NSURLRequest *request;
 
 - (id)initWithFeedURL:(NSURL *)feedURL;
 - (BOOL)parse;
 - (void)stopParsing;
-- (NSURL *)url;
+//- (NSURL *)url;
 
 @end

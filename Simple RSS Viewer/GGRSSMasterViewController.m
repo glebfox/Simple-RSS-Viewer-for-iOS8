@@ -110,17 +110,15 @@
         // Если не первый запуск, то останавливаем прерыдущий парсинг и обнуляем парсер
         if (self.feedParser != nil) {
             [self.feedParser stopParsing];
-            self.feedParser = nil;
+            self.feedParser.url = url;
+        } else {
+            self.feedParser = [[GGRSSFeedParser alloc] initWithFeedURL:url];
         }
-        
-        self.feedParser = [[GGRSSFeedParser alloc] initWithFeedURL:url];
         self.feedParser.delegate = delegate;
         self.parsedItems = nil;
         self.parsedItems = [NSMutableArray new];
         self.newFeedParsing = YES;
         [self.feedParser parse];
-    } else {
-        
     }
 }
 
@@ -225,9 +223,9 @@
     self.title = NSLocalizedString (@"MasterViewTitle_Failed", nil);
     [self feedParserDidFinish:parser];    
     [[GGRSSFeedsCollection sharedInstance] setLastUsedUrl:nil];
-    if (error.code != GGRSS_ERROR_CODE_CONNECTION_FAILED) {
-        self.feedParser = nil;
-    }
+//    if (error.code != GGRSS_ERROR_CODE_CONNECTION_FAILED) {
+//        self.feedParser = nil;
+//    }
 }
 
 
