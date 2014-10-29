@@ -125,7 +125,7 @@ NSString *const GGRSSFeedParserBackgroundSessionIdentifier = @"com.gorelov.Simpl
     // Проверяем доступность хоста
     Reachability* reachability = [Reachability reachabilityWithHostName: [self.url host]];
     NetworkStatus netStatus = [reachability currentReachabilityStatus];
-    // хост может быть недоступен по двум причинам: 1. Не правильный адрес 2. Нет подулючения к сети
+    // хост может быть недоступен по двум причинам: 1. Не правильный адрес 2. Нет подключения к сети
     // т.к. NSURLSession backhroundTask все равно запустит ожидание подключения, чтобы загрузить все позже,
     // в случае отсутствия сети так же останавливаем работу парсера, чтобы не сбивать пользователя с толку
     // бесконечным спинером

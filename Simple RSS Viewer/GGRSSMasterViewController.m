@@ -24,6 +24,9 @@
 @property (strong, nonatomic) NSDateFormatter *formatter;
 @property (strong, nonatomic) NSArray *itemsToDisplay;
 
+@property (strong, nonatomic) NSArray *cachedItems;
+@property (strong, nonatomic) NSString *cachedTitle;
+
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 
 @property (nonatomic, getter=isNewFeedParsing) BOOL newFeedParsing;
@@ -116,6 +119,8 @@
             self.feedParser = [[GGRSSFeedParser alloc] initWithFeedURL:url];
         }
         self.feedParser.delegate = delegate;
+        self.cachedItems = nil;
+        self.cachedTitle = nil;
         self.parsedItems = nil;
         self.parsedItems = [NSMutableArray new];
         self.newFeedParsing = YES;
@@ -128,6 +133,8 @@
 - (void)refresh
 {
     if (self.feedParser) {
+        self.cachedItems = [self.parsedItems copy];
+        self.cachedTitle = self.title;
         self.title = NSLocalizedString (@"MasterViewTitle_Refreshing", nil);
         [self.parsedItems removeAllObjects];
         [self.feedParser stopParsing];
@@ -141,8 +148,13 @@
 
 - (IBAction)stop:(id)sender {
     [self.feedParser stopParsing];
+    if (self.cachedItems && self.parsedItems.count == 0) {
+        self.parsedItems = [NSMutableArray arrayWithArray:self.cachedItems];
+        self.title = self.cachedTitle;
+    } else {
+        self.title = @"";
+    }
     [self feedParserDidFinish:nil];
-    self.title = @"";
 }
 
 - (void)updateTableWithParsedItems
